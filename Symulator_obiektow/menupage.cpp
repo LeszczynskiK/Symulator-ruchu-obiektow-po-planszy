@@ -12,7 +12,7 @@ MenuPage::MenuPage(QWidget *parent) : QWidget(parent)
     setFixedSize(x, y);//Set window size
 
     //Background image
-    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/LinuxManager/LinMenager/AllPages.png").scaled(x, y);
+    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/MenuMain.png").scaled(x, y);
 
 
     QFont font;
@@ -28,12 +28,14 @@ MenuPage::MenuPage(QWidget *parent) : QWidget(parent)
     simulationButton = new QPushButton("Go to simulation page..", this);//go to simulation page button
     simulationButton->setFont(font);
     simulationButton->setGeometry(x_pos, y_pos, x_size, y_siz);
+    simulationButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(simulationButton, &QPushButton::clicked, this, &MenuPage::goToSimulation);//if clicked, go to simulation page
 
 
     exitAppButton = new QPushButton("Exit app...", this);//exit app
     exitAppButton->setFont(font);
     exitAppButton->setGeometry(x_pos, y_pos+y_siz+gap, x_size, y_siz);
+    exitAppButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(exitAppButton, &QPushButton::clicked, this, &MenuPage::exitApp);
 }
 

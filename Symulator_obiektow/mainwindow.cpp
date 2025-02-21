@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     setFixedSize(x, y);//Set window size
 
     //Background image
-    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/LinuxManager/LinMenager/AllPages.png").scaled(x, y);
+    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/AppPage.jpg").scaled(x, y);
 
 
     QFont font;
@@ -26,11 +26,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     menuButton = new QPushButton("Menu", this);//go to main menu
     menuButton->setFont(font);
     menuButton->setGeometry(x_pos, y_pos, x_size, y_siz);
+    menuButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(menuButton, &QPushButton::clicked, this, &MainWindow::backToMenu);//if clicked, go back to menu page
 
     exitAppButton = new QPushButton("Exit", this);//exit app
     exitAppButton->setFont(font);
     exitAppButton->setGeometry(x_pos, y_pos+y_siz+gap, x_size, y_siz);
+    exitAppButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(exitAppButton, &QPushButton::clicked, this, &MainWindow::exitApp);
 
 }
