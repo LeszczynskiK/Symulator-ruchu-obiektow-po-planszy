@@ -1,0 +1,1 @@
+# Symulator-ruchu-obiektow-po-planszy
