@@ -1,14 +1,54 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
-    ui->setupUi(this);
+    setWindowTitle("Shakes physics simulation");
+
+    const int x =1366;//x window size
+    const int y=768;//y window size
+
+    setFixedSize(x, y);//Set window size
+
+    //Background image
+    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/LinuxManager/LinMenager/AllPages.png").scaled(x, y);
+
+
+    QFont font;
+    font.setPointSize(16);//Font size
+
+    //Initialize buttons
+    int x_pos=5;
+    int gap=10;
+    int y_pos = 670;
+    int y_siz =40;
+    int x_size=145;
+
+    menuButton = new QPushButton("Menu", this);//go to main menu
+    menuButton->setFont(font);
+    menuButton->setGeometry(x_pos, y_pos, x_size, y_siz);
+    connect(menuButton, &QPushButton::clicked, this, &MainWindow::backToMenu);//if clicked, go back to menu page
+
+    exitAppButton = new QPushButton("Exit", this);//exit app
+    exitAppButton->setFont(font);
+    exitAppButton->setGeometry(x_pos, y_pos+y_siz+gap, x_size, y_siz);
+    connect(exitAppButton, &QPushButton::clicked, this, &MainWindow::exitApp);
+
 }
 
-MainWindow::~MainWindow()
+void MainWindow::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.drawPixmap(0, 0, background);//Background
+    QWidget::paintEvent(event);
+}
+
+void MainWindow::exitApp()
 {
-    delete ui;
+    this->close();//close this window
+}
+
+void MainWindow::backToMenu()//go back to main menu
+{
+    MenuPage *menPage = new MenuPage();
+    menPage->show();//display menu page
+    this->close();//close this page
 }
