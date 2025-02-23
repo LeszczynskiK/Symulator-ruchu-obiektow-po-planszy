@@ -1,23 +1,30 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QPushButton>
+#include <QLabel>
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
-QT_END_NAMESPACE
+#include "menupage.h"
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QWidget {
     Q_OBJECT
+
+private slots:
+    void paintEvent(QPaintEvent *event);//background setter
+    void exitApp();
+    void backToMenu();//go back to 1st page
+
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
 private:
-    Ui::MainWindow *ui;
+    QPixmap background;//Background txt
+    QPushButton *exitAppButton;
+    QPushButton *menuButton;//go to welcome page button
+    QLabel *frame;//frame on screen(area to simulation of object phycics)
 };
+
 #endif // MAINWINDOW_H
