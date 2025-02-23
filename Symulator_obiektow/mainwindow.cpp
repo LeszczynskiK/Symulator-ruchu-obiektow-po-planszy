@@ -12,6 +12,10 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     //Background image
     background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/AppPage.jpg").scaled(x, y);
 
+    //Frame based on QLabel(frame with transparent background and "frame" around)
+    frame = new QLabel(this);
+    frame->setGeometry(0, 0, 1366, 663);
+    frame->setStyleSheet("background-color: transparent; border: 10px solid black;");
 
     QFont font;
     font.setPointSize(16);//Font size

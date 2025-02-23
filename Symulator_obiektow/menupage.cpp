@@ -1,6 +1,8 @@
 #include "menupage.h"
-
 #include "mainwindow.h"
+#include "informations.h"
+
+
 
 MenuPage::MenuPage(QWidget *parent) : QWidget(parent)
 {
@@ -24,6 +26,12 @@ MenuPage::MenuPage(QWidget *parent) : QWidget(parent)
     int y_pos = 510;
     int y_siz =100;
     int x_size=420;
+
+    informationButton = new QPushButton("Information", this);//go to main menu
+    informationButton->setFont(font);
+    informationButton->setGeometry(x_pos, y_pos-y_siz-gap, x_size, y_siz);
+    informationButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
+    connect(informationButton, &QPushButton::clicked, this, &MenuPage::showInformation);//if clicked, go back to menu page
 
     simulationButton = new QPushButton("Go to simulation page..", this);//go to simulation page button
     simulationButton->setFont(font);
@@ -54,5 +62,12 @@ void MenuPage::goToSimulation()//go back to main menu
 {
     MainWindow *simPage = new MainWindow();
     simPage->show();//display simulation page
+    this->close();//close this page
+}
+
+void MenuPage::showInformation()//go back to main menu
+{
+    Informations *infPage = new Informations();
+    infPage->show();//display simulation page
     this->close();//close this page
 }

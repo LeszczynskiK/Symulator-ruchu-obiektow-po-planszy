@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPushButton>
+#include <QLabel>
 
 #include "menupage.h"
 
@@ -23,6 +24,7 @@ private:
     QPixmap background;//Background txt
     QPushButton *exitAppButton;
     QPushButton *menuButton;//go to welcome page button
+    QLabel *frame;//frame on screen(area to simulation of object phycics)
 };
 
 #endif // MAINWINDOW_H

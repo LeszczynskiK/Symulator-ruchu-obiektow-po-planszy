@@ -13,6 +13,7 @@ private slots:
     void paintEvent(QPaintEvent *event);//background setter
     void exitApp();
     void goToSimulation();//go to simulation page
+    void showInformation();//go to simulation page
 
 
 public:
@@ -21,6 +22,7 @@ private:
     QPixmap background;//Background txt
     QPushButton *exitAppButton;
     QPushButton *simulationButton;//go to simulation page
+    QPushButton *informationButton;//go to simulaton page button
 };
 
 #endif // MENUPAGE_H
