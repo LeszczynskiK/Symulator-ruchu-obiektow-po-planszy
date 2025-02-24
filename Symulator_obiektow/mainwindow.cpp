@@ -12,6 +12,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     //Background image
     background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/AppPage.jpg").scaled(x, y);
 
+    //initialise scene and views
+    scene = new QGraphicsScene(0, 0, 1366, 663, this);
+    view = new QGraphicsView(scene, this);
+    view->setGeometry(0, 0, 1366, 663);
+    view->setStyleSheet("background: transparent");
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     //Frame based on QLabel(frame with transparent background and "frame" around)
     frame = new QLabel(this);
     frame->setGeometry(0, 0, 1366, 663);
@@ -120,50 +128,94 @@ void MainWindow::backToMenu()//go back to main menu
 
 void MainWindow::respSquare()//your choise to resp object is.. square
 {
-
+    QGraphicsRectItem *square = new QGraphicsRectItem(0, 0, 50, 50);//construct object square(size is 50x50)
+    square->setBrush(Qt::blue);//set brush - colour of the bojbect
+    square->setPos(600, 350);//resp object on this pos
+    scene->addItem(square);//add item to scene
+    squares.append(square);//add item to list(list with square objects)
 }
 
 void MainWindow::respRectangle()//your choise to resp object is.. rectangle
 {
-
+    QGraphicsRectItem *rectangle = new QGraphicsRectItem(0, 0, 80, 40);//construct object rectangle(size is 80x40)
+    rectangle->setBrush(Qt::red);//set brush - colour of the object
+    rectangle->setPos(600, 350);//resp object on this pos
+    scene->addItem(rectangle);//add item to scene
+    rectangles.append(rectangle);//add item to list(list with rectangle objects)
 }
 
 void MainWindow::respCircle()//your choise to resp object is.. circle
 {
-
+    QGraphicsEllipseItem *circle = new QGraphicsEllipseItem(0, 0, 40, 40);//construct object circle(size is 40x40 on 2*radius x and y)
+    circle->setBrush(Qt::yellow);//set brush - colour of the object
+    circle->setPos(600, 350);//resp object on this pos
+    scene->addItem(circle);//add item to scene
+    circles.append(circle);//add item to list(list with circle objects)
 }
 
 void MainWindow::respTriangle()//your choise to resp object is.. triangle
 {
-
+    QPolygonF triangle;//create triangle based on polygon(lines connecting)
+    triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);//create 3 points(and later connect them to make triangle shape)
+    QGraphicsPolygonItem *triangleItem = new QGraphicsPolygonItem(triangle);//create polygon(final shape is triangle)
+    triangleItem->setBrush(Qt::black);//colour is black
+    triangleItem->setPos(600,350);
+    scene->addItem(triangleItem);//add item to scene
+    triangles.append(triangleItem);//add item to list(list with triangle objects)
 }
 
 void MainWindow::respTrapeze()//your choise to resp object is.. trapeze
 {
-
+    QPolygonF trapeze;//create trapeze based on polygon(lines connecting)
+    trapeze << QPointF(10, 0) << QPointF(40, 0) << QPointF(50, 30) << QPointF(0, 30);//create 4 points to shape trapeze
+    QGraphicsPolygonItem *trapezeItem = new QGraphicsPolygonItem(trapeze);//create polygon(final shape is trapeze_
+    trapezeItem->setBrush(Qt::magenta);//colour is magenta
+    trapezeItem->setPos(600,350);
+    scene->addItem(trapezeItem);//add item to scene
+    trapezes.append(trapezeItem);//add item to list(list with trapeze objects)
 }
 
 void MainWindow::killSquare()//delete all of this type object
 {
-
+    for (auto square : squares) {//iterate throw vector
+        scene->removeItem(square);//remove them from scene
+        delete square;//delete object
+    }
+    squares.clear();//if iterated throw vector, clear
 }
 
 void MainWindow::killRectangle()//delete all of this type object
 {
-
+    for (auto rect : rectangles) {
+        scene->removeItem(rect);
+        delete rect;
+    }
+    rectangles.clear();
 }
 
 void MainWindow::killCircle()//delete all of this type object
 {
-
+    for (auto circle : circles) {
+        scene->removeItem(circle);
+        delete circle;
+    }
+    circles.clear();
 }
 
 void MainWindow::killTriangle()//delete all of this type object
 {
-
+    for (auto triangle : triangles) {
+        scene->removeItem(triangle);
+        delete triangle;
+    }
+    triangles.clear();
 }
 
 void MainWindow::killTrapeze()//delete all of this type object
 {
-
+    for (auto trapeze : trapezes) {
+        scene->removeItem(trapeze);
+        delete trapeze;
+    }
+    trapezes.clear();
 }

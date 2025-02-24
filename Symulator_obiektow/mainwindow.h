@@ -6,6 +6,10 @@
 #include <QPaintEvent>
 #include <QPushButton>
 #include <QLabel>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QList>
 
 #include "menupage.h"
 
@@ -35,6 +39,8 @@ private:
     QPushButton *exitAppButton;
     QPushButton *menuButton;//go to welcome page button
     QLabel *frame;//frame on screen(area to simulation of object phycics)
+    QGraphicsScene *scene;//scene for simulation
+    QGraphicsView *view;//view for scene
     QPushButton *respSquareButton;
     QPushButton *respRectangleButton;
     QPushButton *respCircleButton;
@@ -45,6 +51,13 @@ private:
     QPushButton *killCircleButton;
     QPushButton *killTriangleButton;
     QPushButton *killTrapezeButton;
+
+    //temporary list for object of any type(later will change this on template)
+    QList<QGraphicsItem*> squares;
+    QList<QGraphicsItem*> rectangles;
+    QList<QGraphicsItem*> circles;
+    QList<QGraphicsItem*> triangles;
+    QList<QGraphicsItem*> trapezes;
 };
 
 #endif // MAINWINDOW_H
