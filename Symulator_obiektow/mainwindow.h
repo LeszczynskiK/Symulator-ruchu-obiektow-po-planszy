@@ -6,6 +6,10 @@
 #include <QPaintEvent>
 #include <QPushButton>
 #include <QLabel>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QList>
 
 #include "menupage.h"
 
@@ -16,6 +20,16 @@ private slots:
     void paintEvent(QPaintEvent *event);//background setter
     void exitApp();
     void backToMenu();//go back to 1st page
+    void respSquare();//your choise to resp object is..
+    void respRectangle();//your choise to resp object is..
+    void respCircle();//your choise to resp object is..
+    void respTriangle();//your choise to resp object is..
+    void respTrapeze();//your choise to resp object is..
+    void killSquare();//delete all of this object type
+    void killRectangle();//delete all of this object type
+    void killCircle();//delete all of this object type
+    void killTriangle();//delete all of this object type
+    void killTrapeze();//delete all of this object type
 
 
 public:
@@ -25,6 +39,25 @@ private:
     QPushButton *exitAppButton;
     QPushButton *menuButton;//go to welcome page button
     QLabel *frame;//frame on screen(area to simulation of object phycics)
+    QGraphicsScene *scene;//scene for simulation
+    QGraphicsView *view;//view for scene
+    QPushButton *respSquareButton;
+    QPushButton *respRectangleButton;
+    QPushButton *respCircleButton;
+    QPushButton *respTriangleButton;
+    QPushButton *respTrapezeButton;
+    QPushButton *killSquareButton;
+    QPushButton *killRectangleButton;
+    QPushButton *killCircleButton;
+    QPushButton *killTriangleButton;
+    QPushButton *killTrapezeButton;
+
+    //temporary list for object of any type(later will change this on template)
+    QList<QGraphicsItem*> squares;
+    QList<QGraphicsItem*> rectangles;
+    QList<QGraphicsItem*> circles;
+    QList<QGraphicsItem*> triangles;
+    QList<QGraphicsItem*> trapezes;
 };
 
 #endif // MAINWINDOW_H
