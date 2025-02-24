@@ -15,6 +15,8 @@ SOURCES += \
     menupage.cpp
 
 HEADERS += \
+    ShapeCreator.h \
+    ShapeRemover.h \
     informations.h \
     mainwindow.h \
     menupage.h
