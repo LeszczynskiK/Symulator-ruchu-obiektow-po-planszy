@@ -6,13 +6,13 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
     setWindowTitle("Shakes physics simulation");
 
-    const int x =1366;//x window size
-    const int y=768;//y window size
+    const int x_win =1366;//x window size
+    const int y_win=768;//y window size
 
-    setFixedSize(x, y);//Set window size
+    setFixedSize(x_win, y_win);//Set window size
 
     //Background image
-    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/AppPage.jpg").scaled(x, y);
+    background = QPixmap("/home/krzysiek89/Desktop/QT_aplikacje/Symulator_ruchu_obiektow/Symulator_obiektow/AppPage.jpg").scaled(x_win, y_win);
 
     //initialise scene and views
     scene = new QGraphicsScene(0, 0, 1366, 663, this);
@@ -53,31 +53,31 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     respSquareButton->setFont(font);
     respSquareButton->setGeometry(x_pos+gap+2*x_size, y_pos+y_siz+gap, x_size, y_siz);
     respSquareButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
-    connect(respSquareButton, &QPushButton::clicked, this, &MainWindow::respSquare);
+    connect(respSquareButton, &QPushButton::clicked, this, &MainWindow::changeSquareCondition);
 
     respRectangleButton = new QPushButton("Rectangle", this);
     respRectangleButton->setFont(font);
     respRectangleButton->setGeometry(x_pos+2*gap+3*x_size, y_pos+y_siz+gap, x_size, y_siz);
     respRectangleButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
-    connect(respRectangleButton, &QPushButton::clicked, this, &MainWindow::respRectangle);
+    connect(respRectangleButton, &QPushButton::clicked, this, &MainWindow::changeRectangleCondition);
 
     respCircleButton = new QPushButton("Circle", this);
     respCircleButton->setFont(font);
     respCircleButton->setGeometry(x_pos+3*gap+4*x_size, y_pos+y_siz+gap, x_size, y_siz);
     respCircleButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
-    connect(respCircleButton, &QPushButton::clicked, this, &MainWindow::respCircle);
+    connect(respCircleButton, &QPushButton::clicked, this, &MainWindow::changeCircleConditon);
 
     respTriangleButton = new QPushButton("Triangle", this);
     respTriangleButton->setFont(font);
     respTriangleButton->setGeometry(x_pos+4*gap+5*x_size, y_pos+y_siz+gap, x_size, y_siz);
     respTriangleButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
-    connect(respTriangleButton, &QPushButton::clicked, this, &MainWindow::respTriangle);
+    connect(respTriangleButton, &QPushButton::clicked, this, &MainWindow::changeTriangleCondition);
 
     respTrapezeButton = new QPushButton("Trapeze", this);
     respTrapezeButton->setFont(font);
     respTrapezeButton->setGeometry(x_pos+5*gap+6*x_size, y_pos+y_siz+gap, x_size, y_siz);
     respTrapezeButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
-    connect(respTrapezeButton, &QPushButton::clicked, this, &MainWindow::respTrapeze);
+    connect(respTrapezeButton, &QPushButton::clicked, this, &MainWindow::changeTrapezeCondition);
 
     killSquareButton = new QPushButton("Delete all", this);
     killSquareButton->setFont(font);
@@ -128,44 +128,119 @@ void MainWindow::backToMenu()//go back to main menu
     this->close();//close this page
 }
 
-void MainWindow::respSquare()//your choise to resp object is.. square
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+    // Get mouse position
+    int x = event->position().x();
+    int y = event->position().y();
+
+    // Determine which object to spawn based on the button clicked
+    if (squareCondition) {
+        respSquare(x, y);
+    } else if (rectangleCondition) {
+        respRectangle(x, y);
+    } else if (circleConditon) {
+        respCircle(x, y);
+    } else if (triangleCondition) {
+        respTriangle(x, y);
+    } else if (trapezeCondition) {
+        respTrapeze(x, y);
+    }
+}
+
+bool MainWindow::changeSquareCondition()//is button clicked?
 {
-    auto square = createShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, 600, 350);//<type of figure>scene, size_x,size_y,colour,pos_x,pos_y
+    squareCondition = !squareCondition;//change condition on opposite one
+    return squareCondition;
+}
+
+bool MainWindow::changeRectangleCondition()//is button clicked?
+{
+    rectangleCondition=!rectangleCondition;//change condition on opposite one
+    return rectangleCondition;
+}
+
+bool MainWindow::changeCircleConditon()//is button clicked?
+{
+    circleConditon=!circleConditon;//change condition on opposite one
+    return circleConditon;
+}
+
+bool MainWindow::changeTriangleCondition()//is button clicked?
+{
+    triangleCondition=!triangleCondition;//change condition on opposite one
+    return triangleCondition;
+}
+
+bool MainWindow::changeTrapezeCondition()//is button clicked?
+{
+    trapezeCondition=!trapezeCondition;//change condition on opposite one
+    return trapezeCondition;
+}
+
+
+void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
+{
+    auto square = createShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, x, y);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event
     squares.append(square);
+
+    squareCondition = !squareCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
+    //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
+    //to change from true to false every function calling(funciton possible to call only if true, so each time it will
+    //be transformed to false
 }
 
-void MainWindow::respRectangle()//your choise to resp object is.. rectangle
+void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
 {
-    auto rectangle = createShape<QGraphicsRectItem>(scene, 80, 40, Qt::red, 600, 350);
+    auto rectangle = createShape<QGraphicsRectItem>(scene, 80, 40, Qt::red, x, y);//x,y Position from mouse event
     rectangles.append(rectangle);
+
+    rectangleCondition=!rectangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
+    //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
+    //to change from true to false every function calling(funciton possible to call only if true, so each time it will
+    //be transformed to false
 }
 
-void MainWindow::respCircle()//your choise to resp object is.. circle
+void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 {
-    auto circle = createShape<QGraphicsEllipseItem>(scene, 40, 40, Qt::green, 600, 350);
+    auto circle = createShape<QGraphicsEllipseItem>(scene, 40, 40, Qt::green, x, y);//x,y Position from mouse event
     circles.append(circle);
+
+    circleConditon=!circleConditon;//this resp funciton is called only one(when object type selected and mouse pressed),
+    //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
+    //to change from true to false every function calling(funciton possible to call only if true, so each time it will
+    //be transformed to false
 }
 
-void MainWindow::respTriangle()//your choise to resp object is.. triangle
+void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. triangle
 {
     QPolygonF triangle;//create triangle based on polygon(lines connecting)
     triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);//create 3 points(and later connect them to make triangle shape)
     QGraphicsPolygonItem *triangleItem = new QGraphicsPolygonItem(triangle);//create polygon(final shape is triangle)
     triangleItem->setBrush(Qt::black);//colour is black
-    triangleItem->setPos(600,350);
+    triangleItem->setPos(x,y);//Position from mouse event
     scene->addItem(triangleItem);//add item to scene
     triangles.append(triangleItem);//add item to list(list with triangle objects)
+
+    triangleCondition=!triangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
+    //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
+    //to change from true to false every function calling(funciton possible to call only if true, so each time it will
+    //be transformed to false
 }
 
-void MainWindow::respTrapeze()//your choise to resp object is.. trapeze
+void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trapeze
 {
     QPolygonF trapeze;//create trapeze based on polygon(lines connecting)
     trapeze << QPointF(10, 0) << QPointF(40, 0) << QPointF(50, 30) << QPointF(0, 30);//create 4 points to shape trapeze
     QGraphicsPolygonItem *trapezeItem = new QGraphicsPolygonItem(trapeze);//create polygon(final shape is trapeze_
     trapezeItem->setBrush(Qt::magenta);//colour is magenta
-    trapezeItem->setPos(600,350);
+    trapezeItem->setPos(x,y);//Position from mouse event
     scene->addItem(trapezeItem);//add item to scene
     trapezes.append(trapezeItem);//add item to list(list with trapeze objects)
+
+    trapezeCondition=!trapezeCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
+    //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
+    //to change from true to false every function calling(funciton possible to call only if true, so each time it will
+    //be transformed to false
 }
 
 void MainWindow::killSquare()//delete all of this type object
