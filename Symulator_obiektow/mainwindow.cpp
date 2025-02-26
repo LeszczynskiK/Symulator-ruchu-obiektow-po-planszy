@@ -2,6 +2,7 @@
 #include "ShapeCreator.h"//template of class for figure objects
 #include "ShapeRemover.h"//template for figure deleting
 
+
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
     setWindowTitle("Shakes physics simulation");
@@ -135,11 +136,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
     // Determine which object to spawn based on the button clicked
     if (squareCondition) {
-        respSquare(x, y);
+        spawnShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, x, y);//Create square
     } else if (rectangleCondition) {
-        respRectangle(x, y);
+        spawnShape<QGraphicsRectItem>(scene, 100, 50, Qt::green, x, y);//Create rectangle
     } else if (circleConditon) {
-        respCircle(x, y);
+        spawnShape<QGraphicsEllipseItem>(scene, 50, 50, Qt::red, x, y);//Create circle
     } else if (triangleCondition) {
         respTriangle(x, y);
     } else if (trapezeCondition) {
@@ -180,8 +181,7 @@ bool MainWindow::changeTrapezeCondition()//is button clicked?
 
 void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 {
-    auto square = createShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, x, y);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event
-    squares.append(square);
+    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 50, 50, QColor(Qt::blue), x, y);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event
 
     squareCondition = !squareCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -191,8 +191,7 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 
 void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
 {
-    auto rectangle = createShape<QGraphicsRectItem>(scene, 80, 40, Qt::red, x, y);//x,y Position from mouse event
-    rectangles.append(rectangle);
+    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 100, 50, QColor(Qt::green), x, y);//x,y Position from mouse event
 
     rectangleCondition=!rectangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -202,8 +201,7 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
 
 void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 {
-    auto circle = createShape<QGraphicsEllipseItem>(scene, 40, 40, Qt::green, x, y);//x,y Position from mouse event
-    circles.append(circle);
+    shapeThreads.emplace_back(createShapeThread<QGraphicsEllipseItem>, scene, 50, 50, QColor(Qt::red), x, y);//x,y Position from mouse event
 
     circleConditon=!circleConditon;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -255,12 +253,12 @@ void MainWindow::killRectangle()//delete all of this type object
 
 void MainWindow::killCircle()//delete all of this type object
 {
-   removeObjects(scene, circles);//remove (name of scene, object type)
+    removeObjects(scene, circles);//remove (name of scene, object type)
 }
 
 void MainWindow::killTriangle()//delete all of this type object
 {
-   removeObjects(scene, triangles);//remove (name of scene, object type)
+    removeObjects(scene, triangles);//remove (name of scene, object type)
 }
 
 void MainWindow::killTrapeze()//delete all of this type object
