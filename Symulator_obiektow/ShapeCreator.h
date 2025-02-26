@@ -26,11 +26,15 @@ void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor 
     localShape->setBrush(color);//add color to figure
     localShape->setPos(posX, posY);//set position of figure on scene
 
+    //Invokes a method on the 'scene' object asynchronously using a lambda function.
+    //The lambda captures 'scene' and 'localShape', moving 'localShape' into the lambda as 'shape'.
+    //This ensures that 'localShape' is properly transferred and used in the method call within the 'scene' object.
     QMetaObject::invokeMethod(scene, [scene, shape = move(localShape)]() {
         scene->addItem(shape.get());//Add shape to scene in the main thread
         {
             lock_guard<mutex> lock(shapeMutex);//Lock access to shared resource
-            shapeObjects.push_back(std::unique_ptr<QGraphicsItem>(std::move(shape).release()));//Store the shape object
+            shapeObjects.push_back(std::unique_ptr<QGraphicsItem>(std::move(shape).release()));//Releases the ownership of the 'shape' object and stores it in the 'shapeObjects' vector
+            //as a unique pointer to a QGraphicsItem.
         }
     }, Qt::QueuedConnection);//Qt::QueuedConnection ensures this is executed in the main thread
 }

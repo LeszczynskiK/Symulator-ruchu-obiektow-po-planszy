@@ -243,17 +243,17 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
 
 void MainWindow::killSquare()//delete all of this type object
 {
-    removeObjects(scene, squares);//remove (name of scene, object type)
+    removeShapes<QGraphicsRectItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
 }
 
 void MainWindow::killRectangle()//delete all of this type object
 {
-    removeObjects(scene, rectangles);//remove (name of scene, object type)
+    removeShapes<QGraphicsRectItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
 }
 
 void MainWindow::killCircle()//delete all of this type object
 {
-    removeObjects(scene, circles);//remove (name of scene, object type)
+    removeShapes<QGraphicsEllipseItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
 }
 
 void MainWindow::killTriangle()//delete all of this type object
