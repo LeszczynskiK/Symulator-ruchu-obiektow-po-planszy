@@ -144,19 +144,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
     // Determine which object to spawn based on the button clicked
     if (squareCondition) {
-<<<<<<< HEAD
-        spawnShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, x, y);//Create square
-    } else if (rectangleCondition) {
-        spawnShape<QGraphicsRectItem>(scene, 100, 50, Qt::green, x, y);//Create rectangle
-    } else if (circleConditon) {
-        spawnShape<QGraphicsEllipseItem>(scene, 50, 50, Qt::red, x, y);//Create circle
-=======
         respSquare(x, y);//Create square
     } else if (rectangleCondition) {
         respRectangle(x, y);//Create rectangle
     } else if (circleConditon) {
         respCircle(x, y);//Create circle
->>>>>>> testy
     } else if (triangleCondition) {
         respTriangle(x, y);
     } else if (trapezeCondition) {
@@ -227,11 +219,7 @@ bool MainWindow::changeTrapezeCondition()//is button clicked?
 
 void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 {
-<<<<<<< HEAD
-    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 50, 50, QColor(Qt::blue), x, y);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event
-=======
     spawnShape<QGraphicsRectItem>(scene, 50, 50, QColor(Qt::blue), x, y, squares);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event, type of object
->>>>>>> testy
 
     squareCondition = !squareCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -241,11 +229,7 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 
 void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
 {
-<<<<<<< HEAD
-    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 100, 50, QColor(Qt::green), x, y);//x,y Position from mouse event
-=======
     spawnShape<QGraphicsRectItem>(scene, 100, 50, QColor(Qt::green), x, y, rectangles);//x,y Position from mouse event
->>>>>>> testy
 
     rectangleCondition=!rectangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -255,11 +239,7 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
 
 void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 {
-<<<<<<< HEAD
-    shapeThreads.emplace_back(createShapeThread<QGraphicsEllipseItem>, scene, 50, 50, QColor(Qt::red), x, y);//x,y Position from mouse event
-=======
     spawnShape<QGraphicsEllipseItem>(scene, 50, 50, QColor(Qt::red), x, y, circles);//x,y Position from mouse event
->>>>>>> testy
 
     circleConditon=!circleConditon;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
