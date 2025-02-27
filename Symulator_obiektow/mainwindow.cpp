@@ -2,6 +2,13 @@
 #include "ShapeCreator.h"//template of class for figure objects
 #include "ShapeRemover.h"//template for figure deleting
 
+//vectors to keep object
+vector<thread> shapeThreads;//all objects
+vector<unique_ptr<QGraphicsRectItem>> squares;//square object etc....
+vector<unique_ptr<QGraphicsRectItem>> rectangles;
+vector<unique_ptr<QGraphicsEllipseItem>> circles;
+vector<unique_ptr<QGraphicsPolygonItem>> triangles;
+vector<unique_ptr<QGraphicsPolygonItem>> trapezes;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
@@ -119,6 +126,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
 void MainWindow::exitApp()
 {
+    joinThreads();//add all threads before closing
     this->close();//close this window
 }
 
@@ -136,11 +144,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
     // Determine which object to spawn based on the button clicked
     if (squareCondition) {
-        spawnShape<QGraphicsRectItem>(scene, 50, 50, Qt::blue, x, y);//Create square
+        respSquare(x, y);//Create square
     } else if (rectangleCondition) {
-        spawnShape<QGraphicsRectItem>(scene, 100, 50, Qt::green, x, y);//Create rectangle
+        respRectangle(x, y);//Create rectangle
     } else if (circleConditon) {
-        spawnShape<QGraphicsEllipseItem>(scene, 50, 50, Qt::red, x, y);//Create circle
+        respCircle(x, y);//Create circle
     } else if (triangleCondition) {
         respTriangle(x, y);
     } else if (trapezeCondition) {
@@ -151,37 +159,67 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 bool MainWindow::changeSquareCondition()//is button clicked?
 {
     squareCondition = !squareCondition;//change condition on opposite one
+    if (squareCondition) {
+        rectangleCondition = false;
+        circleConditon = false;
+        triangleCondition = false;
+        trapezeCondition = false;
+    }
     return squareCondition;
 }
 
 bool MainWindow::changeRectangleCondition()//is button clicked?
 {
     rectangleCondition=!rectangleCondition;//change condition on opposite one
+    if (rectangleCondition) {
+        squareCondition = false;
+        circleConditon = false;
+        triangleCondition = false;
+        trapezeCondition = false;
+    }
     return rectangleCondition;
 }
 
 bool MainWindow::changeCircleConditon()//is button clicked?
 {
     circleConditon=!circleConditon;//change condition on opposite one
+    if (circleConditon) {
+        squareCondition = false;
+        rectangleCondition = false;
+        triangleCondition = false;
+        trapezeCondition = false;
+    }
     return circleConditon;
 }
 
 bool MainWindow::changeTriangleCondition()//is button clicked?
 {
     triangleCondition=!triangleCondition;//change condition on opposite one
+    if (triangleCondition) {
+        squareCondition = false;
+        rectangleCondition = false;
+        circleConditon = false;
+        trapezeCondition = false;
+    }
     return triangleCondition;
 }
 
 bool MainWindow::changeTrapezeCondition()//is button clicked?
 {
     trapezeCondition=!trapezeCondition;//change condition on opposite one
+    if (trapezeCondition) {
+        squareCondition = false;
+        rectangleCondition = false;
+        circleConditon = false;
+        triangleCondition = false;
+    }
     return trapezeCondition;
 }
 
 
 void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 {
-    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 50, 50, QColor(Qt::blue), x, y);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event
+    spawnShape<QGraphicsRectItem>(scene, 50, 50, QColor(Qt::blue), x, y, squares);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event, type of object
 
     squareCondition = !squareCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -191,7 +229,7 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 
 void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
 {
-    shapeThreads.emplace_back(createShapeThread<QGraphicsRectItem>, scene, 100, 50, QColor(Qt::green), x, y);//x,y Position from mouse event
+    spawnShape<QGraphicsRectItem>(scene, 100, 50, QColor(Qt::green), x, y, rectangles);//x,y Position from mouse event
 
     rectangleCondition=!rectangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -201,7 +239,7 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
 
 void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 {
-    shapeThreads.emplace_back(createShapeThread<QGraphicsEllipseItem>, scene, 50, 50, QColor(Qt::red), x, y);//x,y Position from mouse event
+    spawnShape<QGraphicsEllipseItem>(scene, 50, 50, QColor(Qt::red), x, y, circles);//x,y Position from mouse event
 
     circleConditon=!circleConditon;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -243,17 +281,17 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
 
 void MainWindow::killSquare()//delete all of this type object
 {
-    removeShapes<QGraphicsRectItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
+    removeShapes(scene, squares);//delete only squares
 }
 
 void MainWindow::killRectangle()//delete all of this type object
 {
-    removeShapes<QGraphicsRectItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
+    removeShapes(scene, rectangles);
 }
 
 void MainWindow::killCircle()//delete all of this type object
 {
-    removeShapes<QGraphicsEllipseItem>(scene, shapeThreads, shapeObjects);//remove (name of scene, object type)
+    removeShapes(scene, circles);
 }
 
 void MainWindow::killTriangle()//delete all of this type object
