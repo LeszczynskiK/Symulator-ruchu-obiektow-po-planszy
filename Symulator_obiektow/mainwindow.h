@@ -32,7 +32,6 @@ private slots:
     void killTrapeze();//delete all of this object type
     void mousePressEvent(QMouseEvent *event);//mouse event handling(here to resp object on click place)
 
-
 public:
     MainWindow(QWidget *parent = nullptr);
 
@@ -56,6 +55,8 @@ private:
     QLabel *frame;//frame on screen(area to simulation of object phycics)
     QGraphicsScene *scene;//scene for simulation
     QGraphicsView *view;//view for scene
+
+    //buttons for resp or delete object
     QPushButton *respSquareButton;
     QPushButton *respRectangleButton;
     QPushButton *respCircleButton;
@@ -68,11 +69,8 @@ private:
     QPushButton *killTrapezeButton;
 
     //temporary list for object of any type(later will change this on template)
-    QList<QGraphicsItem*> squares;
-    QList<QGraphicsItem*> rectangles;
-    QList<QGraphicsItem*> circles;
-    QList<QGraphicsItem*> triangles;
-    QList<QGraphicsItem*> trapezes;
+    QList<QGraphicsPolygonItem*> triangles;
+    QList<QGraphicsPolygonItem*> trapezes;
 };
 
 #endif // MAINWINDOW_H
