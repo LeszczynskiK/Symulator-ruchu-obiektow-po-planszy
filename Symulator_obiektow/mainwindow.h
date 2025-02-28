@@ -9,8 +9,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <QList>
-
 #include "menupage.h"
 
 class MainWindow : public QWidget {
@@ -67,10 +65,6 @@ private:
     QPushButton *killCircleButton;
     QPushButton *killTriangleButton;
     QPushButton *killTrapezeButton;
-
-    //temporary list for object of any type(later will change this on template)
-    QList<QGraphicsPolygonItem*> triangles;
-    QList<QGraphicsPolygonItem*> trapezes;
 };
 
 #endif // MAINWINDOW_H

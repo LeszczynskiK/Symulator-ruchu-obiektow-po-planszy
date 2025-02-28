@@ -16,7 +16,9 @@ SOURCES += \
 
 HEADERS += \
     ShapeCreator.h \
+    ShapeCreatorPoints.h \
     ShapeRemover.h \
+    ShapeRemoverPoints.h \
     informations.h \
     mainwindow.h \
     menupage.h

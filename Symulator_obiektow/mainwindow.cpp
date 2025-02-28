@@ -1,8 +1,15 @@
 #include "mainwindow.h"
+
+//template for rect objects
 #include "ShapeCreator.h"//template of class for figure objects
 #include "ShapeRemover.h"//template for figure deleting
 
-//vectors to keep object
+
+//template for object based on points connection
+#include "ShapeCreatorPoints.h"//For triangles, trapezoids
+#include "ShapeRemoverPoints.h"//For triangles, trapezoids
+
+//vectors to store object
 vector<thread> shapeThreads;//all objects
 vector<unique_ptr<QGraphicsRectItem>> squares;//square object etc....
 vector<unique_ptr<QGraphicsRectItem>> rectangles;
@@ -118,15 +125,15 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     connect(killTrapezeButton, &QPushButton::clicked, this, &MainWindow::killTrapeze);
 }
 
-void MainWindow::paintEvent(QPaintEvent *event) {
+void MainWindow::paintEvent(QPaintEvent *event) {//Paint event to draw the background
     QPainter painter(this);
     painter.drawPixmap(0, 0, background);//Background
-    QWidget::paintEvent(event);
+    QWidget::paintEvent(event);//Call base class paint event
 }
 
 void MainWindow::exitApp()
 {
-    joinThreads();//add all threads before closing
+    joinThreads();//Wait for all threads to finish before closing
     this->close();//close this window
 }
 
@@ -150,16 +157,16 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     } else if (circleConditon) {
         respCircle(x, y);//Create circle
     } else if (triangleCondition) {
-        respTriangle(x, y);
+        respTriangle(x, y);//Create triangle
     } else if (trapezeCondition) {
-        respTrapeze(x, y);
+        respTrapeze(x, y);//create trapeze
     }
 }
 
 bool MainWindow::changeSquareCondition()//is button clicked?
 {
     squareCondition = !squareCondition;//change condition on opposite one
-    if (squareCondition) {
+    if (squareCondition) {//and if this mode is selected, disable other modes
         rectangleCondition = false;
         circleConditon = false;
         triangleCondition = false;
@@ -171,7 +178,7 @@ bool MainWindow::changeSquareCondition()//is button clicked?
 bool MainWindow::changeRectangleCondition()//is button clicked?
 {
     rectangleCondition=!rectangleCondition;//change condition on opposite one
-    if (rectangleCondition) {
+    if (rectangleCondition) {//and if this mode is selected, disable other modes
         squareCondition = false;
         circleConditon = false;
         triangleCondition = false;
@@ -183,7 +190,7 @@ bool MainWindow::changeRectangleCondition()//is button clicked?
 bool MainWindow::changeCircleConditon()//is button clicked?
 {
     circleConditon=!circleConditon;//change condition on opposite one
-    if (circleConditon) {
+    if (circleConditon) {//and if this mode is selected, disable other modes
         squareCondition = false;
         rectangleCondition = false;
         triangleCondition = false;
@@ -195,7 +202,7 @@ bool MainWindow::changeCircleConditon()//is button clicked?
 bool MainWindow::changeTriangleCondition()//is button clicked?
 {
     triangleCondition=!triangleCondition;//change condition on opposite one
-    if (triangleCondition) {
+    if (triangleCondition) {//and if this mode is selected, disable other modes
         squareCondition = false;
         rectangleCondition = false;
         circleConditon = false;
@@ -207,7 +214,7 @@ bool MainWindow::changeTriangleCondition()//is button clicked?
 bool MainWindow::changeTrapezeCondition()//is button clicked?
 {
     trapezeCondition=!trapezeCondition;//change condition on opposite one
-    if (trapezeCondition) {
+    if (trapezeCondition) {//and if this mode is selected, disable other modes
         squareCondition = false;
         rectangleCondition = false;
         circleConditon = false;
@@ -249,13 +256,10 @@ void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 
 void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. triangle
 {
-    QPolygonF triangle;//create triangle based on polygon(lines connecting)
-    triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);//create 3 points(and later connect them to make triangle shape)
-    QGraphicsPolygonItem *triangleItem = new QGraphicsPolygonItem(triangle);//create polygon(final shape is triangle)
-    triangleItem->setBrush(Qt::black);//colour is black
-    triangleItem->setPos(x,y);//Position from mouse event
-    scene->addItem(triangleItem);//add item to scene
-    triangles.append(triangleItem);//add item to list(list with triangle objects)
+    QPolygonF triangle;
+    triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);
+
+    spawnPolygonShape<QGraphicsPolygonItem>(scene, triangle, QColor(Qt::black), x, y, triangles);
 
     triangleCondition=!triangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -265,13 +269,10 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
 
 void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trapeze
 {
-    QPolygonF trapeze;//create trapeze based on polygon(lines connecting)
-    trapeze << QPointF(10, 0) << QPointF(40, 0) << QPointF(50, 30) << QPointF(0, 30);//create 4 points to shape trapeze
-    QGraphicsPolygonItem *trapezeItem = new QGraphicsPolygonItem(trapeze);//create polygon(final shape is trapeze_
-    trapezeItem->setBrush(Qt::magenta);//colour is magenta
-    trapezeItem->setPos(x,y);//Position from mouse event
-    scene->addItem(trapezeItem);//add item to scene
-    trapezes.append(trapezeItem);//add item to list(list with trapeze objects)
+    QPolygonF trapeze;
+    trapeze << QPointF(10, 0) << QPointF(40, 0) << QPointF(50, 30) << QPointF(0, 30);
+
+    spawnPolygonShape<QGraphicsPolygonItem>(scene, trapeze, QColor(Qt::magenta), x, y, trapezes);
 
     trapezeCondition=!trapezeCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -296,10 +297,10 @@ void MainWindow::killCircle()//delete all of this type object
 
 void MainWindow::killTriangle()//delete all of this type object
 {
-    removeObjects(scene, triangles);//remove (name of scene, object type)
+    removePolygonShapes(scene, triangles);//delete all of this type
 }
 
 void MainWindow::killTrapeze()//delete all of this type object
 {
-    removeObjects(scene, trapezes);//remove (name of scene, object type)
+    removePolygonShapes(scene, trapezes);//delete all of this type
 }
