@@ -39,8 +39,15 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
     //Frame based on QLabel(frame with transparent background and "frame" around)
     frame = new QLabel(this);
-    frame->setGeometry(0, 0, 1366, 663);
-    frame->setStyleSheet("background-color: transparent; border: 10px solid black;");
+    frame->setGeometry(0, 0, x_frame, y_frame);
+    frame->setStyleSheet("background-color: transparent; border: " + QString::number(frame_siz) + "px solid black;");
+
+    //Save area frame- here resp by mouse click can be done(inside this area)
+    int save_area_size_x=1366-2*save_gap-2*frame_siz;
+    int save_area_size_y=663-2*save_gap-2*frame_siz;
+    saveAreaFrame = new QLabel(this);
+    saveAreaFrame->setGeometry(save_gap+frame_siz, save_gap+frame_siz, save_area_size_x, save_area_size_y);
+    saveAreaFrame->setStyleSheet("background-color: transparent; border:1px dotted black;");//1px frame width
 
     QFont font;
     font.setPointSize(16);//Font size
@@ -144,22 +151,45 @@ void MainWindow::backToMenu()//go back to main menu
     this->close();//close this page
 }
 
+bool MainWindow::isWithinFrame(int x, int y) {
+
+    //counting "save" coordinates(area) to make possible object resp by mouse click
+    const int frameLeft = frame_siz + save_gap;//Left boundary
+    const int frameRight = x_frame -frame_siz -save_gap;//Right boundary
+    const int frameTop = frame_siz + save_gap;//Top boundary
+    const int frameBottom = y_frame - frame_siz - save_gap;//Bottom boundary
+
+    if(x >= frameLeft && x <= frameRight && y >= frameTop && y <= frameBottom)//mouse coursor inside "save" area?
+    {
+        return 1;//return 1 if yes
+    }
+    return 0;//return bool as 0 if not
+}
+
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     // Get mouse position
     int x = event->position().x();
     int y = event->position().y();
 
-    // Determine which object to spawn based on the button clicked
-    if (squareCondition) {
-        respSquare(x, y);//Create square
-    } else if (rectangleCondition) {
-        respRectangle(x, y);//Create rectangle
-    } else if (circleConditon) {
-        respCircle(x, y);//Create circle
-    } else if (triangleCondition) {
-        respTriangle(x, y);//Create triangle
-    } else if (trapezeCondition) {
-        respTrapeze(x, y);//create trapeze
+    //check if the click is within the valid frame area
+    if (!isWithinFrame(x, y)) {//if is not inside save area
+        QMessageBox::warning(this, "Invalid Position", "Objects can be spawned only inside save area(-30px from frame)!!!");
+        return;//Exit the function if outside the save area
+    }
+    else//coursos is inside "save" area
+    {
+        // Determine which object to spawn based on the button clicked
+        if (squareCondition) {
+            respSquare(x, y);//Create square
+        } else if (rectangleCondition) {
+            respRectangle(x, y);//Create rectangle
+        } else if (circleConditon) {
+            respCircle(x, y);//Create circle
+        } else if (triangleCondition) {
+            respTriangle(x, y);//Create triangle
+        } else if (trapezeCondition) {
+            respTrapeze(x, y);//create trapeze
+        }
     }
 }
 

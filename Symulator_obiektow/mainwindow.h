@@ -9,6 +9,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include <QMessageBox>
+
 #include "menupage.h"
 
 class MainWindow : public QWidget {
@@ -51,6 +53,7 @@ private:
     QPushButton *exitAppButton;
     QPushButton *menuButton;//go to welcome page button
     QLabel *frame;//frame on screen(area to simulation of object phycics)
+    QLabel *saveAreaFrame;//area where object can be created on the simulation beginning
     QGraphicsScene *scene;//scene for simulation
     QGraphicsView *view;//view for scene
 
@@ -65,6 +68,13 @@ private:
     QPushButton *killCircleButton;
     QPushButton *killTriangleButton;
     QPushButton *killTrapezeButton;
+
+    //frame area checker
+    bool isWithinFrame(int x, int y);//method to check if position of mouse coursor is inside frame(-50px inside of area)
+    int x_frame=1366;
+    int y_frame=663;
+    int save_gap=30;//px amount from frame to keep area save to resp on the beginning by mouse click
+    int frame_siz=10;//10 px is frame width
 };
 
 #endif // MAINWINDOW_H
