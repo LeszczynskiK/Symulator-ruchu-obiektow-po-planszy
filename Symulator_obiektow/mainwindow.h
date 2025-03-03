@@ -10,8 +10,12 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QMessageBox>
+#include <QTimer>
+#include <memory>
+#include <vector>
 
 #include "menupage.h"
+#include "windpoint.h"
 
 class MainWindow : public QWidget {
     Q_OBJECT
@@ -25,15 +29,18 @@ private slots:
     void respCircle(int,int);//your choise to resp object is..
     void respTriangle(int,int);//your choise to resp object is..
     void respTrapeze(int,int);//your choise to resp object is..
+    void respWindPoint(int, int);//resp wind object based on circle rxr
     void killSquare();//delete all of this object type
     void killRectangle();//delete all of this object type
     void killCircle();//delete all of this object type
     void killTriangle();//delete all of this object type
     void killTrapeze();//delete all of this object type
+    void killWindPoints();//delete all of this object type
     void mousePressEvent(QMouseEvent *event);//mouse event handling(here to resp object on click place)
-
+    void updateSimulation();//event which refresh scene
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);//constructor
+    ~MainWindow();//destructor
 
     //is object type button clicked(object selected? )
     bool squareCondition=false;
@@ -41,12 +48,14 @@ public:
     bool circleConditon=false;
     bool triangleCondition=false;
     bool trapezeCondition=false;
+    bool windPointCondition=false;
 
     bool changeSquareCondition();
     bool changeRectangleCondition();
     bool changeCircleConditon();
     bool changeTriangleCondition();
     bool changeTrapezeCondition();
+    bool changeWindPointCondition();
 
 private:
     QPixmap background;//Background txt
@@ -56,6 +65,7 @@ private:
     QLabel *saveAreaFrame;//area where object can be created on the simulation beginning
     QGraphicsScene *scene;//scene for simulation
     QGraphicsView *view;//view for scene
+    QTimer *simulationTimer;//timer to refresh scene
 
     //buttons for resp or delete object
     QPushButton *respSquareButton;
@@ -63,11 +73,13 @@ private:
     QPushButton *respCircleButton;
     QPushButton *respTriangleButton;
     QPushButton *respTrapezeButton;
+    QPushButton *respWindPointButton;
     QPushButton *killSquareButton;
     QPushButton *killRectangleButton;
     QPushButton *killCircleButton;
     QPushButton *killTriangleButton;
     QPushButton *killTrapezeButton;
+    QPushButton *killWindPointButton;
 
     //frame area checker
     bool isWithinFrame(int x, int y);//method to check if position of mouse coursor is inside frame(-50px inside of area)

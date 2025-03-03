@@ -16,6 +16,7 @@ vector<unique_ptr<QGraphicsRectItem>> rectangles;
 vector<unique_ptr<QGraphicsEllipseItem>> circles;
 vector<unique_ptr<QGraphicsPolygonItem>> triangles;
 vector<unique_ptr<QGraphicsPolygonItem>> trapezes;
+vector<unique_ptr<WindPoint>> windPoints;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
@@ -130,6 +131,27 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     killTrapezeButton->setGeometry(x_pos+5*gap+6*x_size, y_pos, x_size, y_siz);
     killTrapezeButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(killTrapezeButton, &QPushButton::clicked, this, &MainWindow::killTrapeze);
+
+    respWindPointButton = new QPushButton("Wind Point", this);
+    respWindPointButton->setFont(font);
+    respWindPointButton->setGeometry(x_pos + 6 * gap + 7 * x_size, y_pos + y_siz + gap, x_size, y_siz);
+    respWindPointButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");
+    connect(respWindPointButton, &QPushButton::clicked, this, &MainWindow::changeWindPointCondition);
+
+    killWindPointButton = new QPushButton("Delete all", this);
+    killWindPointButton->setFont(font);
+    killWindPointButton->setGeometry(x_pos + 6 * gap + 7 * x_size, y_pos, x_size, y_siz);
+    killWindPointButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");
+    connect(killWindPointButton, &QPushButton::clicked, this, &MainWindow::killWindPoints);
+
+    //timer to refresh view by each 33ms (its about 30fps)
+    simulationTimer = new QTimer(this);
+    connect(simulationTimer, &QTimer::timeout, this, &MainWindow::updateSimulation);
+    simulationTimer->start(33);//1sec / 30 is about 33 -> 30fps
+}
+
+MainWindow::~MainWindow() {
+    delete simulationTimer;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {//Paint event to draw the background
@@ -201,6 +223,7 @@ bool MainWindow::changeSquareCondition()//is button clicked?
         circleConditon = false;
         triangleCondition = false;
         trapezeCondition = false;
+        windPointCondition=false;
     }
     return squareCondition;
 }
@@ -225,6 +248,7 @@ bool MainWindow::changeCircleConditon()//is button clicked?
         rectangleCondition = false;
         triangleCondition = false;
         trapezeCondition = false;
+        windPointCondition=false;
     }
     return circleConditon;
 }
@@ -237,6 +261,7 @@ bool MainWindow::changeTriangleCondition()//is button clicked?
         rectangleCondition = false;
         circleConditon = false;
         trapezeCondition = false;
+        windPointCondition=false;
     }
     return triangleCondition;
 }
@@ -249,10 +274,41 @@ bool MainWindow::changeTrapezeCondition()//is button clicked?
         rectangleCondition = false;
         circleConditon = false;
         triangleCondition = false;
+        windPointCondition=false;
     }
     return trapezeCondition;
 }
 
+bool MainWindow::changeWindPointCondition() {//is button clicked?
+    windPointCondition = !windPointCondition;
+    if (windPointCondition) {
+        squareCondition = false;
+        rectangleCondition = false;
+        circleConditon = false;
+        triangleCondition = false;
+        trapezeCondition = false;
+    }
+    return windPointCondition;
+}
+
+void MainWindow::respWindPoint(int x, int y) {//
+    windPoints.push_back(make_unique<WindPoint>(x, y, 20, scene));
+    windPointCondition = !windPointCondition;
+}
+
+void MainWindow::killWindPoints() {
+    for (auto& windPoint : windPoints) {
+        scene->removeItem(windPoint.get());
+    }
+    windPoints.clear();
+}
+
+void MainWindow::updateSimulation() {
+    for (auto& windPoint : windPoints) {
+        windPoint->applyWindForce(squares, rectangles, circles, triangles, trapezes);
+    }
+    scene->update();
+}
 
 void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 {

@@ -12,7 +12,8 @@ SOURCES += \
     informations.cpp \
     main.cpp \
     mainwindow.cpp \
-    menupage.cpp
+    menupage.cpp \
+    windpoint.cpp
 
 HEADERS += \
     ShapeCreator.h \
@@ -21,7 +22,8 @@ HEADERS += \
     ShapeRemoverPoints.h \
     informations.h \
     mainwindow.h \
-    menupage.h
+    menupage.h \
+    windpoint.h
 
 FORMS +=
 
