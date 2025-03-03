@@ -5,6 +5,8 @@
 #include <QGraphicsScene>
 #include <vector>
 #include <memory>
+using namespace std;
+
 
 class WindPoint : public QGraphicsEllipseItem {//wind point is elipse shape
 public:

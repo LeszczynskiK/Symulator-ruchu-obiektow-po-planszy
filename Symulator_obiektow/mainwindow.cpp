@@ -102,6 +102,12 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     respTrapezeButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(respTrapezeButton, &QPushButton::clicked, this, &MainWindow::changeTrapezeCondition);
 
+    respWindPointButton = new QPushButton("Wind Point", this);
+    respWindPointButton->setFont(font);
+    respWindPointButton->setGeometry(x_pos + 6 * gap + 7 * x_size, y_pos + y_siz + gap, x_size, y_siz);
+    respWindPointButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");
+    connect(respWindPointButton, &QPushButton::clicked, this, &MainWindow::changeWindPointCondition);
+
     killSquareButton = new QPushButton("Delete all", this);
     killSquareButton->setFont(font);
     killSquareButton->setGeometry(x_pos+gap+2*x_size, y_pos, x_size, y_siz);
@@ -131,12 +137,6 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     killTrapezeButton->setGeometry(x_pos+5*gap+6*x_size, y_pos, x_size, y_siz);
     killTrapezeButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");//transparency is equal to 153/255 ->abous 60%
     connect(killTrapezeButton, &QPushButton::clicked, this, &MainWindow::killTrapeze);
-
-    respWindPointButton = new QPushButton("Wind Point", this);
-    respWindPointButton->setFont(font);
-    respWindPointButton->setGeometry(x_pos + 6 * gap + 7 * x_size, y_pos + y_siz + gap, x_size, y_siz);
-    respWindPointButton->setStyleSheet("background-color: rgba(255, 253, 208, 153);color: black;");
-    connect(respWindPointButton, &QPushButton::clicked, this, &MainWindow::changeWindPointCondition);
 
     killWindPointButton = new QPushButton("Delete all", this);
     killWindPointButton->setFont(font);
@@ -211,6 +211,8 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
             respTriangle(x, y);//Create triangle
         } else if (trapezeCondition) {
             respTrapeze(x, y);//create trapeze
+        } else if (windPointCondition) {
+            respWindPoint(x, y);//create wind point
         }
     }
 }
@@ -281,6 +283,7 @@ bool MainWindow::changeTrapezeCondition()//is button clicked?
 
 bool MainWindow::changeWindPointCondition() {//is button clicked?
     windPointCondition = !windPointCondition;
+    qDebug() << "WindPoint condition changed to:" << windPointCondition;
     if (windPointCondition) {
         squareCondition = false;
         rectangleCondition = false;
@@ -292,7 +295,8 @@ bool MainWindow::changeWindPointCondition() {//is button clicked?
 }
 
 void MainWindow::respWindPoint(int x, int y) {//
-    windPoints.push_back(make_unique<WindPoint>(x, y, 20, scene));
+    windPoints.push_back(make_unique<WindPoint>(x, y, 30, scene));
+    scene->update();//refresh scene view
     windPointCondition = !windPointCondition;
 }
 
@@ -304,6 +308,28 @@ void MainWindow::killWindPoints() {
 }
 
 void MainWindow::updateSimulation() {
+
+    auto removeOutOfBounds = [&](auto& items) {
+        items.erase(remove_if(items.begin(), items.end(), [&](const auto& item) {
+                        if (!item) return false;//if pointer  not exist, return false
+                        QPointF itemPos = item->pos() + QPointF(item->boundingRect().width() / 2, item->boundingRect().height() / 2);
+                        bool outOfBounds = (itemPos.x() < frame_siz + save_gap || itemPos.x() > x_frame - frame_siz - save_gap ||
+                                            itemPos.y() < frame_siz + save_gap || itemPos.y() > y_frame - frame_siz - save_gap);
+                        if (outOfBounds) {
+                            scene->removeItem(item.get());
+                            return true;//delete object
+                        }
+                        return false;
+                    }), items.end());
+    };
+
+    //delete objects from vectors(if object is passed to removeOutOfBounds vectr)
+    removeOutOfBounds(squares);//if passed to this vector(square type) then delete here
+    removeOutOfBounds(rectangles);//same as aboxe...
+    removeOutOfBounds(circles);
+    removeOutOfBounds(triangles);
+    removeOutOfBounds(trapezes);
+
     for (auto& windPoint : windPoints) {
         windPoint->applyWindForce(squares, rectangles, circles, triangles, trapezes);
     }
