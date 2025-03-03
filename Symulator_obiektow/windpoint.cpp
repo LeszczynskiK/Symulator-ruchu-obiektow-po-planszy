@@ -9,15 +9,21 @@ using namespace std;
 
 WindPoint::WindPoint(float x, float y, float radius, QGraphicsScene* scene)
     : QGraphicsEllipseItem(x - radius / 2, y - radius / 2, radius, radius),//set start position(1st and 2nd argument), and set x and y radius size of ellipse
-    windRadius(1500),//example wind width of having impacts on objects
+    windRadius(500),//example wind width of having impacts on objects
     maxForce(20),//max push force value(in newton N) - start value(later will be calculated on force variable)
     scene(scene)//scene name
 {
     setBrush(QBrush(Qt::yellow));//interior colour of wind object
     setPen(QPen(Qt::black));//frame of wind object
     scene->addItem(this);
-    setZValue(1);//above other items *this is about layer)
-    qDebug() << "WindPoint created at:" << x << "," << y;//to check becouse i have problems with visibility of windblock
+
+    //Explicitly set the position to ensure pos() reflects the correct location
+    setPos(x - radius / 2, y - radius / 2); //Set the position of the item
+    setZValue(10);//Ensure WindPoint is above other items
+    qDebug() << "WindPoint created at (x, y):" << x << "," << y
+             << "Initial pos():" << pos()
+             << "Rect:" << rect()
+             << "Is Visible:" << isVisible() << "Opacity:" << opacity();
 }
 
 void WindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//get vectors which have vectors of created object of any type
@@ -28,6 +34,11 @@ void WindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//
 {
     //Calculate the center position of the wind point (top-left pos + half of width/height)
     QPointF windPos = pos() + QPointF(rect().width() / 2, rect().height() / 2);
+
+    qDebug() << "WindPoint pos():" << pos() << "Rect:" << rect() << "Calculated center:" << windPos
+             << "Is Visible:" << isVisible() << "Opacity:" << opacity()
+             << "Scene Rect:" << scene->sceneRect();
+
     //pos() - circle is based on rectangle(it return positon of left-top corner)
     //QPointF is variable which has 2 variables inside(x,y)
     //so we get x and y width and height of circle(circle inside rectangle(becouse circle base on rectagnle(
@@ -44,6 +55,7 @@ void WindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//
             //x = difference in X coords, y = difference in Y coords
             //this gives the straight-line distance from the wind point to the item's center
             float distance = hypot(windPos.x() - itemPos.x(), windPos.y() - itemPos.y());
+            qDebug() << "Object center at:" << itemPos << "Distance:" << distance;
 
             //Check if the item is within the wind's radius and not at the exact same position (avoid division by zero)
             if (distance < windRadius && distance > 0) {
@@ -52,15 +64,15 @@ void WindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//
                 //if closer to object, then stronger power is
                 float force = maxForce * (1 - (distance * distance) / (windRadius * windRadius));
 
-                //Calculate the angle between wind point and item using stan2
+                //Calculate the angle between wind point and item using stan2(direction to push away)
                 //atan2(y, x) returns the angle (in radians) from the positive X-axis to the point (x, y)
                 //y = difference in Y coords, x = difference in X coords
                 //This gives the direction from the wind point to the item, ranging from -pi to pi
-                float angle = atan2(itemPos.y() - windPos.y(), itemPos.x() - windPos.x());
+                float angle = atan2(windPos.y() - itemPos.y(), windPos.x() - itemPos.x());
 
                 //Calculate the horizontal (x) and vertical (y) components of the force using trigonometry
-                float dx = force * cos(angle);//Movement along the X-axis
-                float dy = force * sin(angle);//Movement along the Y-axis
+                float dx = -force * cos(angle);//Movement along the X-axis(nevative to push away)
+                float dy = -force * sin(angle);//Movement along the Y-axis(nevative to push away)
 
                 //Move the item by the calculated amounts (dx, dy) to simulate the wind effect
                 item->moveBy(dx, dy);

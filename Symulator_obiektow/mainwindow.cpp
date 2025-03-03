@@ -309,12 +309,25 @@ void MainWindow::killWindPoints() {
 
 void MainWindow::updateSimulation() {
 
+    //Define a generic lambda function to remove objects that are outside the black frame boundaries
+    //This function works with any container of unique_ptr<QGraphicsItem> (squares, circles, etc.)
     auto removeOutOfBounds = [&](auto& items) {
+
+        //Use remove_if and erase to remove objects that are out of bounds
+        //The lambda checks each item in the vector and returns true if the item should be removed
         items.erase(remove_if(items.begin(), items.end(), [&](const auto& item) {
                         if (!item) return false;//if pointer  not exist, return false
+
+                        //Calculate the center position of the item by adding half of its bounding rectangle
+                        //to its top-left position (pos()). This ensures we check the item's center, not its top-left corner
                         QPointF itemPos = item->pos() + QPointF(item->boundingRect().width() / 2, item->boundingRect().height() / 2);
+
+                        //Check if the item's center is outside the safe area (black frame boundaries)
+                        // The boundaries are defined by frame_siz (frame width) and save_gap (margin from frame)
                         bool outOfBounds = (itemPos.x() < frame_siz + save_gap || itemPos.x() > x_frame - frame_siz - save_gap ||
                                             itemPos.y() < frame_siz + save_gap || itemPos.y() > y_frame - frame_siz - save_gap);
+
+                        //If the item is out of bounds, remove it from the scene and mark it for erasure
                         if (outOfBounds) {
                             scene->removeItem(item.get());
                             return true;//delete object
@@ -344,6 +357,11 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
+
+    if (!squares.empty()) {
+        qDebug() << "Square pos():" << squares.back()->pos()
+        << "BoundingRect:" << squares.back()->boundingRect();
+    }
 }
 
 void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
@@ -354,6 +372,11 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
+
+    if (!rectangles.empty()) {
+        qDebug() << "Rectangle pos():" << rectangles.back()->pos()
+        << "BoundingRect:" << rectangles.back()->boundingRect();
+    }
 }
 
 void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
@@ -364,6 +387,11 @@ void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
+
+    if (!circles.empty()) {
+        qDebug() << "Circle pos():" << circles.back()->pos()
+        << "BoundingRect:" << circles.back()->boundingRect();
+    }
 }
 
 void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. triangle
@@ -377,6 +405,11 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
+
+    if (!triangle.empty()) {
+        qDebug() << "Triangle pos():" << triangles.back()->pos()
+        << "BoundingRect:" << triangles.back()->boundingRect();
+    }
 }
 
 void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trapeze
@@ -390,6 +423,11 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
+
+    if (!trapezes.empty()) {
+        qDebug() << "Trapeze pos():" << trapezes.back()->pos()
+        << "BoundingRect:" << trapezes.back()->boundingRect();
+    }
 }
 
 void MainWindow::killSquare()//delete all of this type object
