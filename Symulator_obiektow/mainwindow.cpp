@@ -148,6 +148,20 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     simulationTimer = new QTimer(this);
     connect(simulationTimer, &QTimer::timeout, this, &MainWindow::updateSimulation);
     simulationTimer->start(33);//1sec / 30 is about 33 -> 30fps
+
+    //type in mass input
+    massInput = new QLineEdit(this);
+    massInput->setGeometry(x_pos+7*gap+8*x_size, y_pos, x_size*0.75, y_siz);
+    massInput->setText("Mass[kg]");
+    massInput->setFont(font);
+    massInput->show();
+
+    //type in friction input
+    frictionInput = new QLineEdit(this);
+    frictionInput->setGeometry(x_pos+7*gap+8*x_size, y_pos+y_siz+gap, x_size*0.75, y_siz);
+    frictionInput->setText("Friction");
+    frictionInput->setFont(font);
+    frictionInput->show();
 }
 
 MainWindow::~MainWindow() {
@@ -330,6 +344,10 @@ void MainWindow::updateSimulation() {
                         //If the item is out of bounds, remove it from the scene and mark it for erasure
                         if (outOfBounds) {
                             scene->removeItem(item.get());
+                            delete massInputs[item.get()];
+                            delete frictionInputs[item.get()];
+                            massInputs.erase(item.get());
+                            frictionInputs.erase(item.get());
                             return true;//delete object
                         }
                         return false;
@@ -359,8 +377,7 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
     //be transformed to false
 
     if (!squares.empty()) {
-        qDebug() << "Square pos():" << squares.back()->pos()
-        << "BoundingRect:" << squares.back()->boundingRect();
+        qDebug() << "Square pos():" << squares.back()->pos() << "BoundingRect:" << squares.back()->boundingRect();
     }
 }
 
@@ -374,8 +391,7 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
     //be transformed to false
 
     if (!rectangles.empty()) {
-        qDebug() << "Rectangle pos():" << rectangles.back()->pos()
-        << "BoundingRect:" << rectangles.back()->boundingRect();
+        qDebug() << "Rectangle pos():" << rectangles.back()->pos() << "BoundingRect:" << rectangles.back()->boundingRect();
     }
 }
 
@@ -389,8 +405,7 @@ void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
     //be transformed to false
 
     if (!circles.empty()) {
-        qDebug() << "Circle pos():" << circles.back()->pos()
-        << "BoundingRect:" << circles.back()->boundingRect();
+        qDebug() << "Circle pos():" << circles.back()->pos() << "BoundingRect:" << circles.back()->boundingRect();
     }
 }
 
@@ -406,9 +421,8 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
     //to change from true to false every function calling(funciton possible to call only if true, so each time it will
     //be transformed to false
 
-    if (!triangle.empty()) {
-        qDebug() << "Triangle pos():" << triangles.back()->pos()
-        << "BoundingRect:" << triangles.back()->boundingRect();
+    if (!triangles.empty()) {
+        qDebug() << "Triangle pos():" << triangles.back()->pos() << "BoundingRect:" << triangles.back()->boundingRect();
     }
 }
 
@@ -425,8 +439,7 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
     //be transformed to false
 
     if (!trapezes.empty()) {
-        qDebug() << "Trapeze pos():" << trapezes.back()->pos()
-        << "BoundingRect:" << trapezes.back()->boundingRect();
+        qDebug() << "Trapeze pos():" << trapezes.back()->pos() << "BoundingRect:" << trapezes.back()->boundingRect();
     }
 }
 

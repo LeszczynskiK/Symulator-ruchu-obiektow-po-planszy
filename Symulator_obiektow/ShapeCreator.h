@@ -29,17 +29,26 @@ mutex shapeMutex;//mutex to ensure thread-safe access to shared resources for ex
 
 //create windpoint (each in new thread)
 void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+
+    //create a unique pointer to a new ThreadedWindPoint object with the specified position and radius
+    //ThreadedWindPoint is a custom class that simulates wind effects in the scene
     auto localWindPoint = make_unique<ThreadedWindPoint>(posX, posY, radius, scene);
+
+    //get a raw pointer to the wind point for adding it to the scene (needed because unique_ptr owns the object).
     ThreadedWindPoint* rawWindPoint = localWindPoint.get();
 
+    //queue the addition of the wind point to the scene in the main thread.
+    //Qt requires GUI-related operations (like adding items to a scene) to happen in the main thread,
+    //so we use invokeMethod with QueuedConnection to ensure thread safety.
     QMetaObject::invokeMethod(scene, [scene, rawWindPoint]() {
         scene->addItem(rawWindPoint);
     }, Qt::QueuedConnection);
 
+    //safely move the ownership of the wind point to the target vector (windPoints).
     {
-        lock_guard<mutex> lock(shapeMutex);
-        targetVector.push_back(move(localWindPoint));
-    }
+        lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access to the targetVector.
+        targetVector.push_back(move(localWindPoint));//transfer ownership of the wind point to the vector.
+    }//mutex is automatically unlocked here when lock_guard goes out of scope.
 }
 
 //run thread for each object of this type
@@ -97,6 +106,10 @@ public:
         : QGraphicsRectItem(0, 0, width, height) {
         setPos(x, y);
     }
+
+    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
+    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
+    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
     QGraphicsItem* getGraphicsItem() override { return this; }
 };
 
@@ -108,6 +121,10 @@ public:
         : QGraphicsEllipseItem(0, 0, width, height) {
         setPos(x, y);
     }
+
+    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
+    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
+    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
     QGraphicsItem* getGraphicsItem() override { return this; }
 };
 

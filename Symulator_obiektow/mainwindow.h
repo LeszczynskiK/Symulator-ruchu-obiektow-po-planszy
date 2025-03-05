@@ -93,7 +93,9 @@ private:
     int save_gap=30;//px amount from frame to keep area save to resp on the beginning by mouse click
     int frame_siz=10;//10 px is frame width
 
-    void createPhysicalInputs(QGraphicsItem* item, float x, float y);//physical inputs to define object
+    void setPhysicalProperties(QGraphicsItem* item);//set physical values(mass and friction) to object
+    QLineEdit *massInput;//to type in mass of the object
+    QLineEdit *frictionInput;//to type in friction input
 };
 
 #endif // MAINWINDOW_H
