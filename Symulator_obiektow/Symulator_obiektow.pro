@@ -13,7 +13,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     menupage.cpp \
-    windpoint.cpp
+    threadedwindpoint.cpp
 
 HEADERS += \
     ShapeCreator.h \
@@ -23,7 +23,7 @@ HEADERS += \
     informations.h \
     mainwindow.h \
     menupage.h \
-    windpoint.h
+    threadedwindpoint.h
 
 FORMS +=
 

@@ -16,7 +16,7 @@ vector<unique_ptr<QGraphicsRectItem>> rectangles;
 vector<unique_ptr<QGraphicsEllipseItem>> circles;
 vector<unique_ptr<QGraphicsPolygonItem>> triangles;
 vector<unique_ptr<QGraphicsPolygonItem>> trapezes;
-vector<unique_ptr<WindPoint>> windPoints;
+vector<unique_ptr<ThreadedWindPoint>> windPoints;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
@@ -295,7 +295,7 @@ bool MainWindow::changeWindPointCondition() {//is button clicked?
 }
 
 void MainWindow::respWindPoint(int x, int y) {//
-    windPoints.push_back(make_unique<WindPoint>(x, y, 30, scene));
+    spawnThreadedWindPoint(scene, x, y, 30, windPoints);
     scene->update();//refresh scene view
     windPointCondition = !windPointCondition;
 }

@@ -12,15 +12,39 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+
+#include "threadedwindpoint.h"//add windpoints to thread bace objects too(library to allow acces)
+
 using namespace std;
 
 extern vector<thread> shapeThreads;//to collect all type of object(no matter what type)
 extern vector<unique_ptr<QGraphicsRectItem>> squares;//vector to collect square objects
 extern vector<unique_ptr<QGraphicsRectItem>> rectangles;//vector to collect rectangle objects
 extern vector<unique_ptr<QGraphicsEllipseItem>> circles;//vector to collect circle objects
+extern vector<unique_ptr<ThreadedWindPoint>> windPoints;//vector to collect wintpoints objects
 
 mutex shapeMutex;//mutex to ensure thread-safe access to shared resources for example vectors
 
+
+//create windpoint (each in new thread)
+void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+    auto localWindPoint = make_unique<ThreadedWindPoint>(posX, posY, radius, scene);
+    ThreadedWindPoint* rawWindPoint = localWindPoint.get();
+
+    QMetaObject::invokeMethod(scene, [scene, rawWindPoint]() {
+        scene->addItem(rawWindPoint);
+    }, Qt::QueuedConnection);
+
+    {
+        lock_guard<mutex> lock(shapeMutex);
+        targetVector.push_back(move(localWindPoint));
+    }
+}
+
+//run thread for each object of this type
+void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+    shapeThreads.emplace_back(createThreadedWindPointThread, scene, posX, posY, radius, ref(targetVector));
+}
 
 //Template function to create a shape in a separate thread
 //T: The type of shape (likeQGraphicsRectItem or QGraphicsEllipseItem)

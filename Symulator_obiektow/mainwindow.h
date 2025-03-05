@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "menupage.h"
-#include "windpoint.h"
+#include "threadedwindpoint.h"
 
 class MainWindow : public QWidget {
     Q_OBJECT
