@@ -14,6 +14,7 @@
 #include <mutex>
 
 #include "threadedwindpoint.h"//add windpoints to thread bace objects too(library to allow acces)
+#include "physicalobject.h"//physical values definition
 
 using namespace std;
 
@@ -88,5 +89,26 @@ void joinThreads() {
         }
     }
 }
+
+//this is class which will specity all of the objects which base on QRectItem
+class PhysicalRectItem : public QGraphicsRectItem, public PhysicalObject {
+public:
+    PhysicalRectItem(float x, float y, float width, float height)
+        : QGraphicsRectItem(0, 0, width, height) {
+        setPos(x, y);
+    }
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
+
+
+//this is class which will specity all of the objects which base on QElipseObject
+class PhysicalEllipseItem : public QGraphicsEllipseItem, public PhysicalObject {
+public:
+    PhysicalEllipseItem(float x, float y, float width, float height)
+        : QGraphicsEllipseItem(0, 0, width, height) {
+        setPos(x, y);
+    }
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
 
 #endif // SHAPECREATOR_H

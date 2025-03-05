@@ -13,6 +13,8 @@
 #include <QTimer>
 #include <memory>
 #include <vector>
+#include <QLineEdit>
+#include <map>//to keep phycisal values of objects(as pair of object type and value of phycisal type)
 
 #include "menupage.h"
 #include "threadedwindpoint.h"
@@ -67,6 +69,9 @@ private:
     QGraphicsView *view;//view for scene
     QTimer *simulationTimer;//timer to refresh scene
 
+    map<QGraphicsItem*, QLineEdit*> massInputs;
+    map<QGraphicsItem*, QLineEdit*> frictionInputs;
+
     //buttons for resp or delete object
     QPushButton *respSquareButton;
     QPushButton *respRectangleButton;
@@ -87,6 +92,8 @@ private:
     int y_frame=663;
     int save_gap=30;//px amount from frame to keep area save to resp on the beginning by mouse click
     int frame_siz=10;//10 px is frame width
+
+    void createPhysicalInputs(QGraphicsItem* item, float x, float y);//physical inputs to define object
 };
 
 #endif // MAINWINDOW_H

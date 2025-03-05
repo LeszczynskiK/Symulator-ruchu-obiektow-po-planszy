@@ -11,6 +11,8 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include "physicalobject.h"//to add physical values to the objects
+
 using namespace std;
 
 extern vector<thread> shapeThreads;//Shared thread pool
@@ -50,5 +52,13 @@ void spawnPolygonShape(QGraphicsScene* scene, const QPolygonF& polygon, QColor c
     // Add a new thread to the shapeThreads vector, passing the createPolygonShapeThread function and its arguments
     shapeThreads.emplace_back(createPolygonShapeThread<T>, scene, polygon, color, posX, posY, ref(targetVector));// ref(targetVector) ensures the vector is passed by reference to the thread
 }
+
+//this is a class to specify all of the objects which base on polygon item(base on shapes made from points)
+class PhysicalPolygonItem : public QGraphicsPolygonItem, public PhysicalObject {
+public:
+    PhysicalPolygonItem(const QPolygonF& polygon)
+        : QGraphicsPolygonItem(polygon) {}
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
 
 #endif // SHAPECREATORPOINTS_H
