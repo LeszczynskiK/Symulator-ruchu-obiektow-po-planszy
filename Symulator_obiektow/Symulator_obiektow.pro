@@ -13,6 +13,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     menupage.cpp \
+    physicalobject.cpp \
     threadedwindpoint.cpp
 
 HEADERS += \
@@ -23,6 +24,7 @@ HEADERS += \
     informations.h \
     mainwindow.h \
     menupage.h \
+    physicalobject.h \
     threadedwindpoint.h
 
 FORMS +=
