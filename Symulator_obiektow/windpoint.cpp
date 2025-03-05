@@ -7,8 +7,8 @@
 
 using namespace std;
 
-WindPoint::WindPoint(float x, float y, float radius, QGraphicsScene* scene)
-    : QGraphicsEllipseItem(x - radius / 2, y - radius / 2, radius, radius),//set start position(1st and 2nd argument), and set x and y radius size of ellipse
+WindPoint::WindPoint(float x, float y, float radius, QGraphicsScene* scene)//set start position(1st and 2nd argument), and y radius size of ellipse
+    : QGraphicsEllipseItem(-radius / 2, -radius / 2, radius, radius),//2 arguments are start pos (co left up corner is on this pos, radius is total size in x and y (diameter)
     windRadius(500),//example wind width of having impacts on objects
     maxForce(20),//max push force value(in newton N) - start value(later will be calculated on force variable)
     scene(scene)//scene name
@@ -16,9 +16,7 @@ WindPoint::WindPoint(float x, float y, float radius, QGraphicsScene* scene)
     setBrush(QBrush(Qt::yellow));//interior colour of wind object
     setPen(QPen(Qt::black));//frame of wind object
     scene->addItem(this);
-
-    //Explicitly set the position to ensure pos() reflects the correct location
-    setPos(x - radius / 2, y - radius / 2); //Set the position of the item
+    setPos(x,y); //Set the position of the item
     setZValue(10);//Ensure WindPoint is above other items
     qDebug() << "WindPoint created at (x, y):" << x << "," << y
              << "Initial pos():" << pos()
@@ -32,8 +30,7 @@ void WindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//
                                vector<unique_ptr<QGraphicsPolygonItem>>& triangles,
                                vector<unique_ptr<QGraphicsPolygonItem>>& trapezes)
 {
-    //Calculate the center position of the wind point (top-left pos + half of width/height)
-    QPointF windPos = pos() + QPointF(rect().width() / 2, rect().height() / 2);
+   QPointF windPos = pos();//mid of windPoint is indirectly in pos(), becouse rect is relatie to 0,0
 
     qDebug() << "WindPoint pos():" << pos() << "Rect:" << rect() << "Calculated center:" << windPos
              << "Is Visible:" << isVisible() << "Opacity:" << opacity()
