@@ -101,11 +101,11 @@ void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor 
 
     //Queue the addition of the polygon to the scene in the main thread (Qt GUI operations must occur in the main thread)    
     //Create etiquere for mass,friction, dx and dy display
-    QGraphicsTextItem* label = new QGraphicsTextItem();
-    QMetaObject::invokeMethod(scene, [scene, rawShape, label, posX, posY, mass, friction]() {
-        label->setDefaultTextColor(Qt::white);
+    QMetaObject::invokeMethod(scene, [scene, rawShape, posX, posY, mass, friction]() {
+        QGraphicsTextItem* label = new QGraphicsTextItem();
+        label->setDefaultTextColor(Qt::black);
         label->setPlainText(QString("dx: 0\ndy: 0\nMass: %1\nFriction: %2").arg(mass).arg(friction));
-        label->setPos(posX, posY - 20);//20px above current object...
+        label->setPos(posX, posY - 70);//20px above current object...
         label->setZValue(20);//layer over object
         scene->addItem(rawShape);//add object
         scene->addItem(label);//add its etiquette
