@@ -6,7 +6,7 @@
 //abstract class
 class PhysicalObject {//this is a class which will characterise physical values of any object(except windpoint)
 public:
-    PhysicalObject();//this is only sketch for more detailed values
+    PhysicalObject(float m, float f):mass(m), friction(f){}//this is only sketch for more detailed values
     virtual ~PhysicalObject() = default;//so abstract destructor to avoid memory leakage
 
     float getMass() const { return mass; }//get mass from QLineEdit

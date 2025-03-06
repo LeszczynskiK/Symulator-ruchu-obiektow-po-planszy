@@ -23,8 +23,8 @@ extern vector<thread> shapeThreads;
 //this is class which will specity all of the objects which base on QRectItem
 class PhysicalRectItem : public QGraphicsRectItem, public PhysicalObject {
 public:
-    PhysicalRectItem(float x, float y, float width, float height)
-        : QGraphicsRectItem(0, 0, width, height) {
+    PhysicalRectItem(float x, float y, float width, float height,float mass, float friction)
+        : QGraphicsRectItem(0, 0, width, height), PhysicalObject(mass, friction) {
         setPos(x, y);
     }
 
@@ -38,8 +38,8 @@ public:
 //this is class which will specity all of the objects which base on QElipseObject
 class PhysicalEllipseItem : public QGraphicsEllipseItem, public PhysicalObject {
 public:
-    PhysicalEllipseItem(float x, float y, float width, float height)
-        : QGraphicsEllipseItem(0, 0, width, height) {
+    PhysicalEllipseItem(float x, float y, float width, float height,float mass, float friction)
+        : QGraphicsEllipseItem(0, 0, width, height),PhysicalObject(mass, friction) {
         setPos(x, y);
     }
 
@@ -91,8 +91,8 @@ inline void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY
 //T: The type of shape (likeQGraphicsRectItem or QGraphicsEllipseItem)
 //arguments are; scene, dimensions, color, and position, and specify the target vector to store it
 template<typename T>
-void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY, vector<unique_ptr<T>>& targetVector) {
-    auto localShape = std::make_unique<T>(0, 0, width, height);//Create a unique pointer to a new shape with specified width and height
+void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY,float mass,float friction, vector<unique_ptr<T>>& targetVector) {
+    auto localShape = std::make_unique<T>(0, 0, width, height,mass, friction);//Create a unique pointer to a new shape with specified width and height
     localShape->setBrush(color);
     localShape->setPos(posX, posY);
 
@@ -115,10 +115,10 @@ void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor 
 //T: The type of shape to spawn
 //Creates a thread that calls createShapeThread with the given parameters
 template<typename T>
-void spawnShape(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY, vector<unique_ptr<T>>& targetVector) {
+void spawnShape(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY,float mass, float friction, vector<unique_ptr<T>>& targetVector) {
 
     //Add a new thread to the shapeThreads vector, passing the createShapeThread function and its arguments
-    shapeThreads.emplace_back(createShapeThread<T>, scene, width, height, color, posX, posY, ref(targetVector));//ref - pass the reference to exact vector we cant
+    shapeThreads.emplace_back(createShapeThread<T>, scene, width, height, color, posX, posY,mass, friction, ref(targetVector));//ref - pass the reference to exact vector we cant
 }
 
 //Function to join all active threads in shapeThreads

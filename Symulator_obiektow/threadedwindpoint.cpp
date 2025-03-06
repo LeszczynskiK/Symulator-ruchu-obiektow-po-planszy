@@ -64,9 +64,14 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
                 //This gives the direction from the wind point to the item, ranging from -pi to pi
                 float angle = atan2(windPos.y() - itemPos.y(), windPos.x() - itemPos.x());
 
+                float mass_value = dynamic_cast<PhysicalObject*>(item.get())->getMass();//mass value
+                float acceleration = force / mass_value;//a = F / m
+
                 //Calculate the horizontal (x) and vertical (y) components of the force using trigonometry
-                float dx = -force * cos(angle);//Movement along the X-axis(nevative to push away)
-                float dy = -force * sin(angle);//Movement along the Y-axis(nevative to push away)
+
+                //dx and dy depends on:force, mass and angle(wirection wind vs object)
+                float dx = -acceleration * cos(angle);//Movement along the X-axis(nevative to push away)
+                float dy = -acceleration * sin(angle);//Movement along the Y-axis(nevative to push away)
 
                 //Move the item by the calculated amounts (dx, dy) to simulate the wind effect
                 item->moveBy(dx, dy);
