@@ -88,12 +88,14 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
                 //actualise etiquere over object(with mass etc..)
                 QGraphicsTextItem* label = obj->getLabel();
                 if (label) {
-                    label->setPlainText(QString("dx: %1\ndy: %2\nMass: %3\nFriction: %4")
-                                            .arg(dx, 0, 'f', 2)
-                                            .arg(dy, 0, 'f', 2)
-                                            .arg(obj->getMass(), 0, 'f', 2)
-                                            .arg(obj->getFriction(), 0, 'f', 2));
-                    label->setPos(item->pos().x(), item->pos().y() - 20); // Przyklej do obiektu
+                    QMetaObject::invokeMethod(scene, [label, dx, dy, mass_value, friction, itemPos = item->pos()]() {
+                        label->setPlainText(QString("dx: %1\ndy: %2\nMass: %3\nFriction: %4")
+                                                .arg(dx, 0, 'f', 2)//dx value
+                                                .arg(dy, 0, 'f', 2)//dy value
+                                                .arg(mass_value, 0, 'f', 2)//mass of object value
+                                                .arg(friction, 0, 'f', 2));//friction of object value
+                        label->setPos(itemPos.x(), itemPos.y() - 20);//actualise etiquete(this will be as always 20px above object)
+                    }, Qt::QueuedConnection);//in main thread
                 }
             }
         }
