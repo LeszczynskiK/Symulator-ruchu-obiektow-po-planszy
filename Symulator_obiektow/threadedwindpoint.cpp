@@ -42,6 +42,10 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
     //all of the captured values by [] are captured by reference
     auto applyForceToItems = [&](auto& items) {//loop throw the each item in provided vector
         for (auto& item : items) {
+
+            PhysicalObject* obj = dynamic_cast<PhysicalObject*>(item.get());//cast item to obj (different type of pointer)
+            if (!obj) continue;//if cast do not suceed...
+
             QPointF itemPos = item->pos() + QPointF(item->boundingRect().width() / 2, item->boundingRect().height() / 2);//count middle point of item
 
             //Calculate the distance between wind point and item using hypot
@@ -73,8 +77,24 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
                 float dx = -acceleration * cos(angle);//Movement along the X-axis(nevative to push away)
                 float dy = -acceleration * sin(angle);//Movement along the Y-axis(nevative to push away)
 
+                //multiply by 1-f(friction impact on object)
+                float friction = obj->getFriction();
+                dx *= (1.0f - friction);
+                dy *= (1.0f - friction);
+
                 //Move the item by the calculated amounts (dx, dy) to simulate the wind effect
                 item->moveBy(dx, dy);
+
+                //actualise etiquere over object(with mass etc..)
+                QGraphicsTextItem* label = obj->getLabel();
+                if (label) {
+                    label->setPlainText(QString("dx: %1\ndy: %2\nMass: %3\nFriction: %4")
+                                            .arg(dx, 0, 'f', 2)
+                                            .arg(dy, 0, 'f', 2)
+                                            .arg(obj->getMass(), 0, 'f', 2)
+                                            .arg(obj->getFriction(), 0, 'f', 2));
+                    label->setPos(item->pos().x(), item->pos().y() - 20); // Przyklej do obiektu
+                }
             }
         }
     };

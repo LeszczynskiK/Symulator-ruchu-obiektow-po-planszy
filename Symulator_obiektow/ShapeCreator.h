@@ -94,14 +94,23 @@ template<typename T>
 void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY,float mass,float friction, vector<unique_ptr<T>>& targetVector) {
     auto localShape = std::make_unique<T>(0, 0, width, height,mass, friction);//Create a unique pointer to a new shape with specified width and height
     localShape->setBrush(color);
+
+    //Create etiquere for mass,friction, dx and dy display
+    QGraphicsTextItem* label = new QGraphicsTextItem();
+    label->setPlainText(QString("dx: 0\ndy: 0\nMass: %1\nFriction: %2").arg(mass).arg(friction));
+    label->setPos(posX, posY - 20);//20px over object
+    label->setZValue(20);//layer above objects
+    localShape->setLabel(label);
+
     localShape->setPos(posX, posY);
 
     //Use a raw pointer for adding to scene, then move ownership to vector
     T* rawShape = localShape.get();
 
     //Queue the addition of the polygon to the scene in the main thread (Qt GUI operations must occur in the main thread)
-    QMetaObject::invokeMethod(scene, [scene, rawShape]() {
+    QMetaObject::invokeMethod(scene, [scene, rawShape,label]() {
         scene->addItem(rawShape);//Add the shape to scene
+        scene->addItem(label);//Add the slabel to scene
     }, Qt::QueuedConnection);
 
     //Move ownership to the vector after queuing the addition
