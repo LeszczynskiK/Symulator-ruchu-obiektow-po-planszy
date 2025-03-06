@@ -11,11 +11,11 @@
 
 //vectors to store object
 vector<thread> shapeThreads;//all objects
-vector<unique_ptr<QGraphicsRectItem>> squares;//square object etc....
-vector<unique_ptr<QGraphicsRectItem>> rectangles;
-vector<unique_ptr<QGraphicsEllipseItem>> circles;
-vector<unique_ptr<QGraphicsPolygonItem>> triangles;
-vector<unique_ptr<QGraphicsPolygonItem>> trapezes;
+vector<unique_ptr<PhysicalRectItem>> squares;//square object etc....
+vector<unique_ptr<PhysicalRectItem>> rectangles;
+vector<unique_ptr<PhysicalEllipseItem>> circles;
+vector<unique_ptr<PhysicalPolygonItem>> triangles;
+vector<unique_ptr<PhysicalPolygonItem>> trapezes;
 vector<unique_ptr<ThreadedWindPoint>> windPoints;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
@@ -152,14 +152,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     //type in mass input
     massInput = new QLineEdit(this);
     massInput->setGeometry(x_pos+7*gap+8*x_size, y_pos, x_size*0.75, y_siz);
-    massInput->setText("Mass[kg]");
+    massInput->setPlaceholderText("Mass[kg]");//show this, if clicked then make it empty and enable to type in value
     massInput->setFont(font);
     massInput->show();
 
     //type in friction input
     frictionInput = new QLineEdit(this);
     frictionInput->setGeometry(x_pos+7*gap+8*x_size, y_pos+y_siz+gap, x_size*0.75, y_siz);
-    frictionInput->setText("Friction");
+    frictionInput->setPlaceholderText("Friction");//show this, if clicked then make it empty and enable to type in value
     frictionInput->setFont(font);
     frictionInput->show();
 }
@@ -185,6 +185,35 @@ void MainWindow::backToMenu()//go back to main menu
     MenuPage *menPage = new MenuPage();
     menPage->show();//display menu page
     this->close();//close this page
+}
+
+void MainWindow::setPhysicalProperties(QGraphicsItem* item) {//set typed in values to object you choosed to create by mouse click and object type choose
+    if (auto* obj = dynamic_cast<PhysicalObject*>(item)) {//put item type toPhysicalObject(change from QgraphicsItem type)
+        bool ok;//bool variable to mark if massInput throw to float suceed
+        float mass = massInput->text().toFloat(&ok);//get mass from QLineEdit
+        if (ok) {//if throw to fload suceed
+
+            //limit input values
+            mass = max(0.00001f, min(100000.0f, mass));
+            obj->setMass(mass);
+        } else {
+            qDebug() << "Invalid mass input, defaulting to 1.0";
+            obj->setMass(1.0f);//set this value is your type is over/below the limit
+        }
+
+
+        //the same situation as above..
+        float friction = frictionInput->text().toFloat(&ok);
+        if (ok) {
+
+            //limit input values
+            friction = std::max(0.0f, std::min(1.0f, friction));
+            obj->setFriction(friction);
+        } else {
+            qDebug() << "Invalid friction input, defaulting to 0.5";
+            obj->setFriction(0.5f);//set this value is your type is over/below the limit
+        }
+    }
 }
 
 bool MainWindow::isWithinFrame(int x, int y) {
@@ -369,7 +398,7 @@ void MainWindow::updateSimulation() {
 
 void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 {
-    spawnShape<QGraphicsRectItem>(scene, 50, 50, QColor(Qt::blue), x, y, squares);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event, type of object
+    spawnShape<PhysicalRectItem>(scene, 50, 50, QColor(Qt::blue), x, y, squares);//<type of figure>scene, size_x,size_y,colour,x y is from mouse event, type of object
 
     squareCondition = !squareCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -378,12 +407,15 @@ void MainWindow::respSquare(int x,int y)//your choise to resp object is.. square
 
     if (!squares.empty()) {
         qDebug() << "Square pos():" << squares.back()->pos() << "BoundingRect:" << squares.back()->boundingRect();
+        setPhysicalProperties(squares.back().get());//set mass and friction to this object
+        massInput->clear();//if resped, clear values from QLineEdit...
+        frictionInput->clear();
     }
 }
 
 void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rectangle
 {
-    spawnShape<QGraphicsRectItem>(scene, 100, 50, QColor(Qt::green), x, y, rectangles);//x,y Position from mouse event
+    spawnShape<PhysicalRectItem>(scene, 100, 50, QColor(Qt::green), x, y, rectangles);//x,y Position from mouse event
 
     rectangleCondition=!rectangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -392,12 +424,15 @@ void MainWindow::respRectangle(int x,int y)//your choise to resp object is.. rec
 
     if (!rectangles.empty()) {
         qDebug() << "Rectangle pos():" << rectangles.back()->pos() << "BoundingRect:" << rectangles.back()->boundingRect();
+        setPhysicalProperties(rectangles.back().get());//set mass and friction to this object
+        massInput->clear();//if resped, clear values from QLineEdit...
+        frictionInput->clear();
     }
 }
 
 void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 {
-    spawnShape<QGraphicsEllipseItem>(scene, 50, 50, QColor(Qt::red), x, y, circles);//x,y Position from mouse event
+    spawnShape<PhysicalEllipseItem>(scene, 50, 50, QColor(Qt::red), x, y, circles);//x,y Position from mouse event
 
     circleConditon=!circleConditon;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -406,6 +441,9 @@ void MainWindow::respCircle(int x,int y)//your choise to resp object is.. circle
 
     if (!circles.empty()) {
         qDebug() << "Circle pos():" << circles.back()->pos() << "BoundingRect:" << circles.back()->boundingRect();
+        setPhysicalProperties(circles.back().get());//set mass and friction to this object
+        massInput->clear();//if resped, clear values from QLineEdit...
+        frictionInput->clear();
     }
 }
 
@@ -414,7 +452,7 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
     QPolygonF triangle;
     triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);
 
-    spawnPolygonShape<QGraphicsPolygonItem>(scene, triangle, QColor(Qt::black), x, y, triangles);
+    spawnPolygonShape<PhysicalPolygonItem>(scene, triangle, QColor(Qt::black), x, y, triangles);
 
     triangleCondition=!triangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -423,6 +461,9 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
 
     if (!triangles.empty()) {
         qDebug() << "Triangle pos():" << triangles.back()->pos() << "BoundingRect:" << triangles.back()->boundingRect();
+        setPhysicalProperties(triangles.back().get());//set mass and friction to this object
+        massInput->clear();//if resped, clear values from QLineEdit...
+        frictionInput->clear();
     }
 }
 
@@ -431,7 +472,7 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
     QPolygonF trapeze;
     trapeze << QPointF(10, 0) << QPointF(40, 0) << QPointF(50, 30) << QPointF(0, 30);
 
-    spawnPolygonShape<QGraphicsPolygonItem>(scene, trapeze, QColor(Qt::magenta), x, y, trapezes);
+    spawnPolygonShape<PhysicalPolygonItem>(scene, trapeze, QColor(Qt::magenta), x, y, trapezes);
 
     trapezeCondition=!trapezeCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
@@ -440,6 +481,9 @@ void MainWindow::respTrapeze(int x,int y)//your choise to resp object is.. trape
 
     if (!trapezes.empty()) {
         qDebug() << "Trapeze pos():" << trapezes.back()->pos() << "BoundingRect:" << trapezes.back()->boundingRect();
+        setPhysicalProperties(trapezes.back().get());//set mass and friction to this object
+        massInput->clear();//if resped, clear values from QLineEdit...
+        frictionInput->clear();
     }
 }
 

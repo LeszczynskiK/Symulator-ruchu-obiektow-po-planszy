@@ -11,16 +11,21 @@
 
 using namespace std;
 
+//forward declaration to avoid recursive adding of .h files
+class PhysicalRectItem;
+class PhysicalEllipseItem;
+class PhysicalPolygonItem;
+
 class ThreadedWindPoint : public QGraphicsEllipseItem {
 public:
     ThreadedWindPoint(float x, float y, float radius, QGraphicsScene* scene);
 
     //put wint impact on all of the passed object in these vectors
-    void applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,
-                        vector<unique_ptr<QGraphicsRectItem>>& rectangles,
-                        vector<unique_ptr<QGraphicsEllipseItem>>& circles,
-                        vector<unique_ptr<QGraphicsPolygonItem>>& triangles,
-                        vector<unique_ptr<QGraphicsPolygonItem>>& trapezes);
+    void applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squares,
+                        vector<unique_ptr<PhysicalRectItem>>& rectangles,
+                        vector<unique_ptr<PhysicalEllipseItem>>& circles,
+                        vector<unique_ptr<PhysicalPolygonItem>>& triangles,
+                        vector<unique_ptr<PhysicalPolygonItem>>& trapezes);
 
 private:
     float windRadius;//max distance of wind strength working on other object

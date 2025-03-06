@@ -13,22 +13,53 @@
 #include <memory>
 #include <mutex>
 
-#include "threadedwindpoint.h"//add windpoints to thread bace objects too(library to allow acces)
 #include "physicalobject.h"//physical values definition
+#include "threadedwindpoint.h"
 
 using namespace std;
 
-extern vector<thread> shapeThreads;//to collect all type of object(no matter what type)
-extern vector<unique_ptr<QGraphicsRectItem>> squares;//vector to collect square objects
-extern vector<unique_ptr<QGraphicsRectItem>> rectangles;//vector to collect rectangle objects
-extern vector<unique_ptr<QGraphicsEllipseItem>> circles;//vector to collect circle objects
-extern vector<unique_ptr<ThreadedWindPoint>> windPoints;//vector to collect wintpoints objects
+extern vector<thread> shapeThreads;
 
-mutex shapeMutex;//mutex to ensure thread-safe access to shared resources for example vectors
+//this is class which will specity all of the objects which base on QRectItem
+class PhysicalRectItem : public QGraphicsRectItem, public PhysicalObject {
+public:
+    PhysicalRectItem(float x, float y, float width, float height)
+        : QGraphicsRectItem(0, 0, width, height) {
+        setPos(x, y);
+    }
+
+    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
+    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
+    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
+
+
+//this is class which will specity all of the objects which base on QElipseObject
+class PhysicalEllipseItem : public QGraphicsEllipseItem, public PhysicalObject {
+public:
+    PhysicalEllipseItem(float x, float y, float width, float height)
+        : QGraphicsEllipseItem(0, 0, width, height) {
+        setPos(x, y);
+    }
+
+    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
+    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
+    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
+
+// extern vector<thread> shapeThreads;//to collect all type of object(no matter what type)
+// extern vector<unique_ptr<PhysicalRectItem>> squares;//vector to collect square objects
+// extern vector<unique_ptr<PhysicalRectItem>> rectangles;//vector to collect rectangle objects
+// extern vector<unique_ptr<PhysicalEllipseItem>> circles;//vector to collect circle objects
+// extern vector<unique_ptr<ThreadedWindPoint>> windPoints;//vector to collect wintpoints objects
+
+extern mutex shapeMutex;//mutex to ensure thread-safe access to shared resources for example vectors
 
 
 //create windpoint (each in new thread)
-void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
 
     //create a unique pointer to a new ThreadedWindPoint object with the specified position and radius
     //ThreadedWindPoint is a custom class that simulates wind effects in the scene
@@ -52,7 +83,7 @@ void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY
 }
 
 //run thread for each object of this type
-void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+inline void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
     shapeThreads.emplace_back(createThreadedWindPointThread, scene, posX, posY, radius, ref(targetVector));
 }
 
@@ -91,41 +122,12 @@ void spawnShape(QGraphicsScene* scene, qreal width, qreal height, QColor color, 
 }
 
 //Function to join all active threads in shapeThreads
-void joinThreads() {
+inline void joinThreads() {
     for (auto& t : shapeThreads) {//iterate throw vector with threads
         if (t.joinable()) {
             t.join();
         }
     }
 }
-
-//this is class which will specity all of the objects which base on QRectItem
-class PhysicalRectItem : public QGraphicsRectItem, public PhysicalObject {
-public:
-    PhysicalRectItem(float x, float y, float width, float height)
-        : QGraphicsRectItem(0, 0, width, height) {
-        setPos(x, y);
-    }
-
-    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
-    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
-    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
-    QGraphicsItem* getGraphicsItem() override { return this; }
-};
-
-
-//this is class which will specity all of the objects which base on QElipseObject
-class PhysicalEllipseItem : public QGraphicsEllipseItem, public PhysicalObject {
-public:
-    PhysicalEllipseItem(float x, float y, float width, float height)
-        : QGraphicsEllipseItem(0, 0, width, height) {
-        setPos(x, y);
-    }
-
-    //override a virtual function from PhysicalObject to return a pointer to the graphical item (itself).
-    //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
-    //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
-    QGraphicsItem* getGraphicsItem() override { return this; }
-};
 
 #endif // SHAPECREATOR_H

@@ -1,5 +1,7 @@
 #include "threadedwindpoint.h"
 #include <QDebug>
+#include "ShapeCreator.h"//for PhysicalRectItem and PhysicalEllipseItem
+#include "ShapeCreatorPoints.h"//for PhysicalPolygonItem
 
 using namespace std;
 
@@ -19,11 +21,11 @@ ThreadedWindPoint::ThreadedWindPoint(float x, float y, float radius, QGraphicsSc
              << "Is Visible:" << isVisible() << "Opacity:" << opacity();
 }
 
-void ThreadedWindPoint::applyWindForce(vector<unique_ptr<QGraphicsRectItem>>& squares,//get vectors which have vectors of created object of any type
-                               vector<unique_ptr<QGraphicsRectItem>>& rectangles,
-                               vector<unique_ptr<QGraphicsEllipseItem>>& circles,
-                               vector<unique_ptr<QGraphicsPolygonItem>>& triangles,
-                               vector<unique_ptr<QGraphicsPolygonItem>>& trapezes)
+void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squares,//get vectors which have vectors of created object of any type
+                               vector<unique_ptr<PhysicalRectItem>>& rectangles,
+                               vector<unique_ptr<PhysicalEllipseItem>>& circles,
+                               vector<unique_ptr<PhysicalPolygonItem>>& triangles,
+                               vector<unique_ptr<PhysicalPolygonItem>>& trapezes)
 {
     QPointF windPos = pos();//mid of windPoint is indirectly in pos(), becouse rect is relatie to 0,0
 

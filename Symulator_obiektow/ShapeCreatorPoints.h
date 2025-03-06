@@ -15,9 +15,17 @@
 
 using namespace std;
 
+//this is a class to specify all of the objects which base on polygon item(base on shapes made from points)
+class PhysicalPolygonItem : public QGraphicsPolygonItem, public PhysicalObject {
+public:
+    PhysicalPolygonItem(const QPolygonF& polygon)
+        : QGraphicsPolygonItem(polygon) {}
+    QGraphicsItem* getGraphicsItem() override { return this; }
+};
+
 extern vector<thread> shapeThreads;//Shared thread pool
-extern vector<unique_ptr<QGraphicsPolygonItem>> triangles;//Vector for triangles
-extern vector<unique_ptr<QGraphicsPolygonItem>> trapezes;//Vector for trapezoids
+extern vector<unique_ptr<PhysicalPolygonItem>> triangles;//Vector for triangles
+extern vector<unique_ptr<PhysicalPolygonItem>> trapezes;//Vector for trapezoids
 extern mutex shapeMutex;//A shared mutex to ensure thread-safe access to shared resources
 
 //Template function to create a polygon shape in a separate thread
@@ -52,13 +60,5 @@ void spawnPolygonShape(QGraphicsScene* scene, const QPolygonF& polygon, QColor c
     // Add a new thread to the shapeThreads vector, passing the createPolygonShapeThread function and its arguments
     shapeThreads.emplace_back(createPolygonShapeThread<T>, scene, polygon, color, posX, posY, ref(targetVector));// ref(targetVector) ensures the vector is passed by reference to the thread
 }
-
-//this is a class to specify all of the objects which base on polygon item(base on shapes made from points)
-class PhysicalPolygonItem : public QGraphicsPolygonItem, public PhysicalObject {
-public:
-    PhysicalPolygonItem(const QPolygonF& polygon)
-        : QGraphicsPolygonItem(polygon) {}
-    QGraphicsItem* getGraphicsItem() override { return this; }
-};
 
 #endif // SHAPECREATORPOINTS_H

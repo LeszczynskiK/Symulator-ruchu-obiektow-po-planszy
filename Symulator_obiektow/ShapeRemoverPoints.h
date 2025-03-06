@@ -7,12 +7,13 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include "ShapeCreatorPoints.h"
 using namespace std;
 
 extern std::mutex shapeMutex;//Shared mutex
 extern vector<thread> shapeThreads;//Shared thread pool
-extern vector<unique_ptr<QGraphicsPolygonItem>> triangles;//Vector for triangles
-extern vector<unique_ptr<QGraphicsPolygonItem>> trapezes;//Vector for trapezoids
+extern vector<unique_ptr<PhysicalPolygonItem>> triangles;//Vector for triangles
+extern vector<unique_ptr<PhysicalPolygonItem>> trapezes;//Vector for trapezoids
 
 //Template function to remove polygon shapes from the scene and clean up memory
 //T: The type of shape (typically QGraphicsPolygonItem)

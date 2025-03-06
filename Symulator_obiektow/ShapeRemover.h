@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include "ShapeCreator.h"
 using namespace std;
 
 //Mutex for thread-safe access to shared resources
@@ -15,9 +16,9 @@ extern std::mutex shapeMutex;//extern becouse we declarated this in ShapeCreator
 
 //vectors to keep objects in
 extern vector<thread> shapeThreads;
-extern vector<unique_ptr<QGraphicsRectItem>> squares;
-extern vector<unique_ptr<QGraphicsRectItem>> rectangles;
-extern vector<unique_ptr<QGraphicsEllipseItem>> circles;
+extern vector<unique_ptr<PhysicalRectItem>> squares;
+extern vector<unique_ptr<PhysicalRectItem>> rectangles;
+extern vector<unique_ptr<PhysicalEllipseItem>> circles;
 
 //Template function to remove shapes from the scene and clean up memory
 //T: The type of shape (like QGraphicsRectItem or QGraphicsEllipseItem)
