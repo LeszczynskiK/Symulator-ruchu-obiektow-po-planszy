@@ -25,7 +25,8 @@ public:
                         vector<unique_ptr<PhysicalRectItem>>& rectangles,
                         vector<unique_ptr<PhysicalEllipseItem>>& circles,
                         vector<unique_ptr<PhysicalPolygonItem>>& triangles,
-                        vector<unique_ptr<PhysicalPolygonItem>>& trapezes);
+                        vector<unique_ptr<PhysicalPolygonItem>>& trapezes,
+                        const vector<unique_ptr<ThreadedWindPoint>>& windPoints);
 
 private:
     float windRadius;//max distance of wind strength working on other object

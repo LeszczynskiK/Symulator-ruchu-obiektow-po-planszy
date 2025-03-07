@@ -391,8 +391,8 @@ void MainWindow::updateSimulation() {
     removeOutOfBounds(triangles);
     removeOutOfBounds(trapezes);
 
-    for (auto& windPoint : windPoints) {
-        windPoint->applyWindForce(squares, rectangles, circles, triangles, trapezes);
+    if (!windPoints.empty()) {//cann only once - becouse we have resultant sum od x and y strenght having impact on objects (impact from wintPoints)
+        windPoints[0]->applyWindForce(squares, rectangles, circles, triangles, trapezes, windPoints);
     }
     scene->update();
 }
@@ -499,7 +499,7 @@ void MainWindow::respTriangle(int x,int y)//your choise to resp object is.. tria
     QPolygonF triangle;
     triangle << QPointF(0, 50) << QPointF(25, 0) << QPointF(50, 50);
 
-    spawnPolygonShape<PhysicalPolygonItem>(scene, triangle, QColor(Qt::black), x, y,mass,friction, triangles);
+    spawnPolygonShape<PhysicalPolygonItem>(scene, triangle, QColor(Qt::white), x, y,mass,friction, triangles);
 
     triangleCondition=!triangleCondition;//this resp funciton is called only one(when object type selected and mouse pressed),
     //it will be possible to resp only if bool is true, i want to have object type choosen for 1 click so i need
