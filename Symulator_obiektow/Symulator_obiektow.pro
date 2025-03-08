@@ -21,6 +21,7 @@ HEADERS += \
     ShapeCreatorPoints.h \
     ShapeRemover.h \
     ShapeRemoverPoints.h \
+    ShapeSpawner.h \
     informations.h \
     mainwindow.h \
     menupage.h \

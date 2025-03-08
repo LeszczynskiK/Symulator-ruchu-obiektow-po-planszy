@@ -18,6 +18,7 @@
 
 #include "menupage.h"
 #include "threadedwindpoint.h"
+#include "ShapeSpawner.h"
 
 class MainWindow : public QWidget {
     Q_OBJECT
