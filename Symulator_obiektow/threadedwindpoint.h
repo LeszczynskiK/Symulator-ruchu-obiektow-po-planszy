@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <cmath>
+#include <thread>
+#include <mutex>
 
 using namespace std;
 
@@ -15,6 +17,8 @@ using namespace std;
 class PhysicalRectItem;
 class PhysicalEllipseItem;
 class PhysicalPolygonItem;
+
+extern mutex shapeMutex;
 
 class ThreadedWindPoint : public QGraphicsEllipseItem {
 public:

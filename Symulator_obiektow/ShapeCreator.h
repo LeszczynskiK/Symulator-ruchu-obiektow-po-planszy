@@ -32,6 +32,9 @@ public:
     //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
     //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
     QGraphicsItem* getGraphicsItem() override { return this; }
+
+    //count surface area of object
+    float getSurfaceArea() const override { return rect().width() * rect().height(); }//width * height(for rectangle type)
 };
 
 
@@ -47,6 +50,13 @@ public:
     //this allows the PhysicalObject base class to interact with the QGraphicsItem interface.
     //returns a QGraphicsItem* pointing to this PhysicalRectItem instance.
     QGraphicsItem* getGraphicsItem() override { return this; }
+
+    //count surface area of object
+    float getSurfaceArea() const override {
+        float radiusX = rect().width() / 2.0f;//radius in x axis is half of width(f - float type)
+        float radiusY = rect().height() / 2.0f;//radius in y axis is half of height
+        return M_PI * radiusX * radiusY;//surface of elipse if pi*r1*r2 (pi*r(square) is r are equal)
+    }
 };
 
 // extern vector<thread> shapeThreads;//to collect all type of object(no matter what type)

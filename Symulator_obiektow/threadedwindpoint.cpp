@@ -42,6 +42,9 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
             float totalDx = 0.0f;//x axis sum
             float totalDy = 0.0f;//y axis sum
 
+            float surfaceArea = obj->getSurfaceArea();//get surface from any type of object
+            float areaFactor = surfaceArea/1000.;//area factor is based on surface(divided by scale factor)
+
             //count strength from all WindPoints
             for (const auto& windPoint : windPoints) {
                 QPointF windPos = windPoint->pos();
@@ -58,7 +61,7 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
 
                     //Calculate the force of the wind: stronger when closer, weaker when farther (non linear decrease)
                     //if closer to object, then stronger power is
-                    float force = windPoint->maxForce * (1 - (distance * distance) / (windPoint->windRadius * windPoint->windRadius));
+                    float force = windPoint->maxForce * (1 - (distance * distance) / (windPoint->windRadius * windPoint->windRadius))*areaFactor;
 
                     //Calculate the angle between wind point and item using stan2(direction to push away)
                     //atan2(y, x) returns the angle (in radians) from the positive X-axis to the point (x, y)
@@ -88,6 +91,7 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
 
             //Move the item by the calculated amounts (dx, dy) to simulate the wind effect
             if (totalDx != 0.0f || totalDy != 0.0f) {
+                lock_guard<mutex> lock(shapeMutex);//protect scene updates
                 item->moveBy(totalDx, totalDy);
 
                 //actualise etiquere over object(with mass etc..)

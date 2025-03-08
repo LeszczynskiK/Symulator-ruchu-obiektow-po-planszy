@@ -16,6 +16,7 @@ public:
     void setFriction(float f) { friction = f; }//set friction to object
 
     virtual QGraphicsItem* getGraphicsItem() = 0;//abstract method to get QGraphicsItem
+    virtual float getSurfaceArea() const = 0;//virtual method for surface area(will be overwritten by exact type of objec)
 
     QGraphicsTextItem* getLabel() const { return label; }
     void setLabel(QGraphicsTextItem* l) { label = l; }

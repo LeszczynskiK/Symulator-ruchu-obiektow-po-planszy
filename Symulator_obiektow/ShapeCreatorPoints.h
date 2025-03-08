@@ -22,6 +22,20 @@ public:
     PhysicalPolygonItem(const QPolygonF& polygon,float mass, float friction)
         : QGraphicsPolygonItem(polygon),PhysicalObject(mass, friction) {}
     QGraphicsItem* getGraphicsItem() override { return this; }
+
+    //count area of polygon shape(depends of points number)
+    float getSurfaceArea() const override {
+        //we will use shoelace formula to calculate polygon area
+        const QPolygonF& poly = polygon();
+        float area = 0.0f;
+        int n = poly.size();
+        for (int i = 0; i < n; ++i) {
+            int j = (i + 1) % n;
+            area += poly[i].x() * poly[j].y();
+            area -= poly[j].x() * poly[i].y();
+        }
+        return fabs(area) / 2.0f;//Absolute value divided by 2
+    }
 };
 
 extern vector<thread> shapeThreads;//Shared thread pool
