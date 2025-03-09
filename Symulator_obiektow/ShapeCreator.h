@@ -87,7 +87,7 @@ inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qre
 
     //safely move the ownership of the wind point to the target vector (windPoints).
     {
-        lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access to the targetVector.
+        //lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access to the targetVector.
         targetVector.push_back(move(localWindPoint));//transfer ownership of the wind point to the vector.
     }//mutex is automatically unlocked here when lock_guard goes out of scope.
 }
@@ -125,7 +125,7 @@ void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor 
 
     //Move ownership to the vector after queuing the addition
     {
-        lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access
+        //lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access
         targetVector.push_back(std::move(localShape));//put to target vector of type(circle etc.)
     }
 }

@@ -91,7 +91,7 @@ void ThreadedWindPoint::applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squ
 
             //Move the item by the calculated amounts (dx, dy) to simulate the wind effect
             if (totalDx != 0.0f || totalDy != 0.0f) {
-                lock_guard<mutex> lock(shapeMutex);//protect scene updates
+                //lock_guard<mutex> lock(shapeMutex);//protect scene updates
                 item->moveBy(totalDx, totalDy);
                 QPointF newPos = item->pos();//position has change becouse we used moveBy(so share new position here! )
 

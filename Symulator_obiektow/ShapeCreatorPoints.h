@@ -70,7 +70,7 @@ void createPolygonShapeThread(QGraphicsScene* scene, const QPolygonF& polygon, Q
 
     //Safely transfer ownership of the polygon to the target vector
     {
-        lock_guard<mutex> lock(shapeMutex);//Lock the mutex to prevent concurrent access to the target vector
+        //lock_guard<mutex> lock(shapeMutex);//Lock the mutex to prevent concurrent access to the target vector
         targetVector.push_back(std::move(localShape));//Move the unique pointer into the target vector (like triangles, trapezes)
     }
 }

@@ -20,7 +20,7 @@ extern vector<unique_ptr<PhysicalPolygonItem>> trapezes;//Vector for trapezoids
 //Parameters: The scene to remove from and the vector containing the polygon shapes to delete
 template<typename T>
 void removePolygonShapes(QGraphicsScene* scene, vector<unique_ptr<T>>& shapeVector) {
-    lock_guard<mutex> lock(shapeMutex);//Lock the mutex to ensure thread-safe access to the shape vector
+    //lock_guard<mutex> lock(shapeMutex);//Lock the mutex to ensure thread-safe access to the shape vector
 
     //Iterate over all polygon shapes in the vector and remove them
     for (auto& shape : shapeVector) {

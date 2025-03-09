@@ -399,7 +399,7 @@ void MainWindow::updateSimulation() {
     removeOutOfBounds(triangles);
     removeOutOfBounds(trapezes);
 
-    lock_guard<mutex> lock(shapeMutex);//to keep away from mistake(windpoints are not being modified in other thread)
+    //lock_guard<mutex> lock(shapeMutex);//to keep away from mistake(windpoints are not being modified in other thread)
 
     if (!windPoints.empty()) {//cann only once - becouse we have resultant sum od x and y strenght having impact on objects (impact from wintPoints)
         windPoints[0]->applyWindForce(squares, rectangles, circles, triangles, trapezes, windPoints);

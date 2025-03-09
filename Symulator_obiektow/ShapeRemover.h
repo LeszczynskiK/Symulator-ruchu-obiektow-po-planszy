@@ -27,7 +27,7 @@ template <typename T>
 void removeShapes(QGraphicsScene* scene, std::vector<std::unique_ptr<T>>& shapeVector) {
 
     //Synchronize access to shapeObjects and shapeThreads
-    std::lock_guard<std::mutex> lock(shapeMutex);//Lock the mutex for thread safety
+   // std::lock_guard<std::mutex> lock(shapeMutex);//Lock the mutex for thread safety
 
     //Remove shapes from the scene and delete them
     for (auto& shape : shapeVector) {
