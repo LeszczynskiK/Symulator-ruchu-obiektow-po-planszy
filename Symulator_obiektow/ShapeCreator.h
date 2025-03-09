@@ -59,12 +59,6 @@ public:
     }
 };
 
-// extern vector<thread> shapeThreads;//to collect all type of object(no matter what type)
-// extern vector<unique_ptr<PhysicalRectItem>> squares;//vector to collect square objects
-// extern vector<unique_ptr<PhysicalRectItem>> rectangles;//vector to collect rectangle objects
-// extern vector<unique_ptr<PhysicalEllipseItem>> circles;//vector to collect circle objects
-// extern vector<unique_ptr<ThreadedWindPoint>> windPoints;//vector to collect wintpoints objects
-
 extern mutex shapeMutex;//mutex to ensure thread-safe access to shared resources for example vectors
 
 
@@ -87,7 +81,7 @@ inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qre
 
     //safely move the ownership of the wind point to the target vector (windPoints).
     {
-        //lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access to the targetVector.
+        lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access to the targetVector.
         targetVector.push_back(move(localWindPoint));//transfer ownership of the wind point to the vector.
     }//mutex is automatically unlocked here when lock_guard goes out of scope.
 }
@@ -102,7 +96,7 @@ inline void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY
 //arguments are; scene, dimensions, color, and position, and specify the target vector to store it
 template<typename T>
 void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor color, qreal posX, qreal posY,float mass,float friction, vector<unique_ptr<T>>& targetVector) {
-    auto localShape = std::make_unique<T>(0, 0, width, height,mass, friction);//Create a unique pointer to a new shape with specified width and height
+    auto localShape = make_unique<T>(0, 0, width, height,mass, friction);//Create a unique pointer to a new shape with specified width and height
     localShape->setBrush(color);
     localShape->setPos(posX, posY);
 
@@ -125,8 +119,8 @@ void createShapeThread(QGraphicsScene* scene, qreal width, qreal height, QColor 
 
     //Move ownership to the vector after queuing the addition
     {
-        //lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access
-        targetVector.push_back(std::move(localShape));//put to target vector of type(circle etc.)
+        lock_guard<mutex> lock(shapeMutex);//lock the mutex to prevent concurrent access
+        targetVector.push_back(move(localShape));//put to target vector of type(circle etc.)
     }
 }
 

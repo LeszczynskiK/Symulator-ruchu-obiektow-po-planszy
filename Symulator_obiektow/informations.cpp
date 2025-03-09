@@ -28,12 +28,13 @@ Informations::Informations(QWidget *parent) : QWidget(parent)
 
     // using \n before " give us possibility to use " as symbol, not as special
     QString instructions = "The goal of this project is to create a physics simulator that models the movement of particles in a 2D space. "
-                           "Particles of different shapes (e.g., circles, squares, triangles) move across the board, responding to \"wind gusts\" "
-                           "and bouncing off the walls of a frame that serves as the boundary of the board.\n\n\n"
-                           "Particles: Different shapes of particles (e.g., circle, square, triangle) are represented by different classes inheriting from a common base class. "
-                           "Particles have various properties (mass, shape, velocity, forces acting on them).\n\n\n"
+                           "Particles of different shapes (circle, square, rectangle, triangle, trapeze) move across the board, responding to \"wind gusts\" "
+                           "and bouncing off when colision between object(figures) is detected.\n\n\n"
+                           "Particles: Different shapes of particles (e.g., circle, square, triangle) are represented by template. "
+                           "Particles have various properties (mass, shape, friction).\n\n\n"
                            "Forces: Particles respond to forces, such as \"wind gusts\" in selected points on the board.\n\n\n"
-                           "Bouncing: Particles bounce off the boundaries of the board according to the principle of reflection, changing the direction of velocity.\n";
+                           "Bouncing: Particles bounce off when collision is detected.\n";
+                           "Edge: Dotted line is edge, every figure behing border is out....\n";
 
 
     //setting of instruction(text will be in semi-transparent background frame)

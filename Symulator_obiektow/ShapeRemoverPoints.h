@@ -10,17 +10,14 @@
 #include "ShapeCreatorPoints.h"
 using namespace std;
 
-extern std::mutex shapeMutex;//Shared mutex
-extern vector<thread> shapeThreads;//Shared thread pool
-extern vector<unique_ptr<PhysicalPolygonItem>> triangles;//Vector for triangles
-extern vector<unique_ptr<PhysicalPolygonItem>> trapezes;//Vector for trapezoids
+extern mutex shapeMutex;//Shared mutex
 
 //Template function to remove polygon shapes from the scene and clean up memory
 //T: The type of shape (typically QGraphicsPolygonItem)
 //Parameters: The scene to remove from and the vector containing the polygon shapes to delete
 template<typename T>
 void removePolygonShapes(QGraphicsScene* scene, vector<unique_ptr<T>>& shapeVector) {
-    //lock_guard<mutex> lock(shapeMutex);//Lock the mutex to ensure thread-safe access to the shape vector
+    lock_guard<mutex> lock(shapeMutex);//Lock the mutex to ensure thread-safe access to the shape vector
 
     //Iterate over all polygon shapes in the vector and remove them
     for (auto& shape : shapeVector) {

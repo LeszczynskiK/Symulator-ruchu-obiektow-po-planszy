@@ -16,6 +16,9 @@
 
 using namespace std;
 
+extern vector<thread> shapeThreads;//Shared thread pool
+extern mutex shapeMutex;//A shared mutex to ensure thread-safe access to shared resources
+
 //this is a class to specify all of the objects which base on polygon item(base on shapes made from points)
 class PhysicalPolygonItem : public QGraphicsPolygonItem, public PhysicalObject {
 public:
@@ -38,17 +41,12 @@ public:
     }
 };
 
-extern vector<thread> shapeThreads;//Shared thread pool
-extern vector<unique_ptr<PhysicalPolygonItem>> triangles;//Vector for triangles
-extern vector<unique_ptr<PhysicalPolygonItem>> trapezes;//Vector for trapezoids
-extern mutex shapeMutex;//A shared mutex to ensure thread-safe access to shared resources
-
 //Template function to create a polygon shape in a separate thread
 //T: The type of shape (like QGraphicsPolygonItem)
 //Parameters define the polygon's geometry (via QPolygonF), color, position, and target vector
 template<typename T>
 void createPolygonShapeThread(QGraphicsScene* scene, const QPolygonF& polygon, QColor color, qreal posX, qreal posY,float mass, float friction, vector<unique_ptr<T>>& targetVector) {
-    auto localShape = std::make_unique<T>(polygon,mass, friction);//Create a unique pointer to a new polygon shape using the provided QPolygonF
+    auto localShape = make_unique<T>(polygon,mass, friction);//Create a unique pointer to a new polygon shape using the provided QPolygonF
     localShape->setBrush(color);
     localShape->setPos(posX, posY);
 
@@ -70,8 +68,8 @@ void createPolygonShapeThread(QGraphicsScene* scene, const QPolygonF& polygon, Q
 
     //Safely transfer ownership of the polygon to the target vector
     {
-        //lock_guard<mutex> lock(shapeMutex);//Lock the mutex to prevent concurrent access to the target vector
-        targetVector.push_back(std::move(localShape));//Move the unique pointer into the target vector (like triangles, trapezes)
+        lock_guard<mutex> lock(shapeMutex);//Lock the mutex to prevent concurrent access to the target vector
+        targetVector.push_back(move(localShape));//Move the unique pointer into the target vector (like triangles, trapezes)
     }
 }
 

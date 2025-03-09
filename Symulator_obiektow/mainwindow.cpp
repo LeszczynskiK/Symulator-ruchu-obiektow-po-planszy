@@ -208,7 +208,7 @@ void MainWindow::setPhysicalProperties(QGraphicsItem* item) {//set typed in valu
         if (ok) {
 
             //limit input values
-            friction = std::max(0.0f, std::min(1.0f, friction));
+            friction = max(0.0f, min(1.0f, friction));
             obj->setFriction(friction);
         } else {
             qDebug() << "Invalid friction input, defaulting to 0.5";

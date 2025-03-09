@@ -12,22 +12,16 @@
 using namespace std;
 
 //Mutex for thread-safe access to shared resources
-extern std::mutex shapeMutex;//extern becouse we declarated this in ShapeCreator.h
-
-//vectors to keep objects in
-extern vector<thread> shapeThreads;
-extern vector<unique_ptr<PhysicalRectItem>> squares;
-extern vector<unique_ptr<PhysicalRectItem>> rectangles;
-extern vector<unique_ptr<PhysicalEllipseItem>> circles;
+extern mutex shapeMutex;//extern becouse we declarated this in ShapeCreator.h
 
 //Template function to remove shapes from the scene and clean up memory
 //T: The type of shape (like QGraphicsRectItem or QGraphicsEllipseItem)
 //Parameters: The scene to remove from and the vector containing the shapes to delete
 template <typename T>
-void removeShapes(QGraphicsScene* scene, std::vector<std::unique_ptr<T>>& shapeVector) {
+void removeShapes(QGraphicsScene* scene, vector<unique_ptr<T>>& shapeVector) {
 
     //Synchronize access to shapeObjects and shapeThreads
-   // std::lock_guard<std::mutex> lock(shapeMutex);//Lock the mutex for thread safety
+    lock_guard<mutex> lock(shapeMutex);//Lock the mutex for thread safety
 
     //Remove shapes from the scene and delete them
     for (auto& shape : shapeVector) {
