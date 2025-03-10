@@ -109,6 +109,13 @@ void CollisionHandler::checkCollisionsBetween(vector<unique_ptr<T1>>& items1, ve
                 float newDx2 = ((m2 - m1) * dx2 + 2 * m1 * dx1) / (m1 + m2); //new x speed for obj2
                 float newDy2 = ((m2 - m1) * dy2 + 2 * m1 * dy1) / (m1 + m2); //new y speed for obj2
 
+                //speed(dx,dy) is very small so i need to scale it to make collision effect vissible
+                float scale = 100.0f;//multiply by value to increase "push" effect
+                newDx1 *= scale;
+                newDy1 *= scale;
+                newDx2 *= scale;
+                newDy2 *= scale;
+
                 //update labels with new velocities(to kave new values (wind + collision impact)
                 updateLabel(obj1->getLabel(), newDx1, newDy1, m1, obj1->getFriction());
                 updateLabel(obj2->getLabel(), newDx2, newDy2, m2, obj2->getFriction());
