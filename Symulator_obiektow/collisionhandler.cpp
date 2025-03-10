@@ -59,19 +59,88 @@ void CollisionHandler::checkCollisionsWithin(vector<unique_ptr<T>>& items)
                 //get masses - needed for realistic bounce based on physics lasw
                 float m1 = obj1->getMass(), m2 = obj2->getMass();
 
-                //calculate new velocities after collision - using elastic bounce with mass
-                float newDx1 = ((m1 - m2) * dx1 + 2 * m2 * dx2) / (m1 + m2); //new x speed for obj1
-                float newDy1 = ((m1 - m2) * dy1 + 2 * m2 * dy2) / (m1 + m2); //new y speed for obj1
-                float newDx2 = ((m2 - m1) * dx2 + 2 * m1 * dx1) / (m1 + m2); //new x speed for obj2
-                float newDy2 = ((m2 - m1) * dy2 + 2 * m1 * dy1) / (m1 + m2); //new y speed for obj2
+                //Calculate the collision normal vector (direction of impact)
+                QPointF pos1 = items[i]->pos();//Position of obj1
+                QPointF pos2 = items[j]->pos();//Position of obj2
+                QRectF rect1 = items[i]->boundingRect();//Bounding rectangle of obj1
+                QRectF rect2 = items[j]->boundingRect();//Bounding rectangle of obj2
+
+                //Calculate center points of both objects
+                QPointF center1 = pos1 + QPointF(rect1.width() / 2, rect1.height() / 2);//Center of obj1
+                QPointF center2 = pos2 + QPointF(rect2.width() / 2, rect2.height() / 2);//Center of obj2
+                QPointF diff = center2 - center1;//vector from center1 to center2
+                float distance = sqrt(diff.x() * diff.x() + diff.y() * diff.y());//Distance between centers
+
+                if (distance == 0) continue;//Avoid division by zero if objects are exactly overlapping(object on object)
+
+                /*
+                Physics principles applied:
+
+                - Conservation of Momentum: The total momentum of the system before and after
+                  the collision remains constant. Given two objects with masses m1 and m2
+                  and velocities v1 and v2, their momentum is conserved:
+                  m1 * v1 + m2 * v2 = m1 * v1' + m2 * v2'
+
+                - Conservation of Kinetic Energy (Elastic Collision): In a perfectly elastic
+                  collision, kinetic energy is conserved:
+                  0.5 * m1 * v1^2 + 0.5 * m2 * v2^2 = 0.5 * m1 * v1'^2 + 0.5 * m2 * v2'^2
+
+                - Normal and Tangent Decomposition: Velocities are projected onto the normal
+                  (collision direction) and tangent (perpendicular to normal) components.
+                  - The normal component is updated using momentum conservation.
+                  - The tangent component remains unchanged (assuming no friction).
+
+                - Unit Normal and Tangent Vectors: The normal vector defines the axis along
+                  which momentum exchange occurs, while the tangent vector remains unaffected.
+
+                - Collision Response: New normal velocities are computed using the
+                  1D elastic collision formula to maintain both momentum and kinetic energy.
+
+                - Object Separation: To prevent objects from sticking together,
+                  they are moved apart based on their masses and calculated overlap.
+                */
+
+                //Normal vector: direction of collision, normalized to unit length
+                //This vector points from obj1 to obj2 and defines the axis along which momentum is exchanged
+                QPointF normal(diff.x() / distance, diff.y() / distance);
+
+                //Tangent vector: perpendicular to the normal vector (-y, x)
+                //This vector defines the axis along which velocity is unaffected (no friction assumed)
+                QPointF tangent(-normal.y(), normal.x());
+
+                //Project velocities onto normal and tangent vectors using dot product
+                float v1n = dx1 * normal.x() + dy1 * normal.y();//Normal component of obj1 velocity
+                float v1t = dx1 * tangent.x() + dy1 * tangent.y();//Tangent component of obj1 velocity
+                float v2n = dx2 * normal.x() + dy2 * normal.y();//Normal component of obj2 velocity
+                float v2t = dx2 * tangent.x() + dy2 * tangent.y();//Tangent component of obj2 velocity
+
+                //Calculate new velocities along the normal axis (elastic collision)
+                //These formulas account for mass and ensure conservation of momentum and energy
+                float newV1n = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);//New normal velocity for obj1
+                float newV2n = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);//New normal velocity for obj2
+
+                //Tangent velocities remain unchanged (no friction in this model)
+                float newV1t = v1t;//Tangent velocity for obj1 stays the same
+                float newV2t = v2t;//Tangent velocity for obj2 stays the same
+
+                //Convert back to x and y components by combining normal and tangent contributions
+                float newDx1 = newV1n * normal.x() + newV1t * tangent.x();//New x velocity for obj1
+                float newDy1 = newV1n * normal.y() + newV1t * tangent.y();//New y velocity for obj1
+                float newDx2 = newV2n * normal.x() + newV2t * tangent.x();//New x velocity for obj2
+                float newDy2 = newV2n * normal.y() + newV2t * tangent.y();//New y velocity for obj2
 
                 //update labels with new velocities(to kave new values (wind + collision impact)
                 updateLabel(obj1->getLabel(), newDx1, newDy1, m1, obj1->getFriction());
                 updateLabel(obj2->getLabel(), newDx2, newDy2, m2, obj2->getFriction());
 
-                //move them a bit to avoid sticking together(use the new speeds)
-                items[i]->moveBy(newDx1, newDy1);
-                items[j]->moveBy(newDx2, newDy2);
+                //Separate objects to prevent sticking
+                //Calculate overlap and move objects apart along the normal vector
+                float overlap = (rect1.width() + rect2.width()) / 2 - distance;//Approximate overlap distance
+                if (overlap > 0) {
+                    float moveFactor = overlap / (m1 + m2);//Distribute movement inversely proportional to mass
+                    items[i]->moveBy(-normal.x() * moveFactor * m2, -normal.y() * moveFactor * m2);//Move obj1 away
+                    items[j]->moveBy(normal.x() * moveFactor * m1, normal.y() * moveFactor * m1);//Move obj2 away
+                }
             }
         }
     }
@@ -97,32 +166,74 @@ void CollisionHandler::checkCollisionsBetween(vector<unique_ptr<T1>>& items1, ve
 
                 //extract dx, dy from labels
                 float dx1 = 0.0f, dy1 = 0.0f, dx2 = 0.0f, dy2 = 0.0f;
-                extractVelocity(obj1->getLabel(), dx1, dy1); //speeds for first object
-                extractVelocity(obj2->getLabel(), dx2, dy2); //speeds for second object
+                extractVelocity(obj1->getLabel(), dx1, dy1);//speeds for first object
+                extractVelocity(obj2->getLabel(), dx2, dy2);//speeds for second object
 
                 //get masses - for the bounce calculation
                 float m1 = obj1->getMass(), m2 = obj2->getMass();
 
-                //calculate new velocities after collision - elastic bounce with mass
-                float newDx1 = ((m1 - m2) * dx1 + 2 * m2 * dx2) / (m1 + m2); //new x speed for obj1
-                float newDy1 = ((m1 - m2) * dy1 + 2 * m2 * dy2) / (m1 + m2); //new y speed for obj1
-                float newDx2 = ((m2 - m1) * dx2 + 2 * m1 * dx1) / (m1 + m2); //new x speed for obj2
-                float newDy2 = ((m2 - m1) * dy2 + 2 * m1 * dy1) / (m1 + m2); //new y speed for obj2
+                //Calculate the collision normal vector (direction of impact)
+                QPointF pos1 = item1->pos();//Position of obj1
+                QPointF pos2 = item2->pos();//Position of obj2
+                QRectF rect1 = item1->boundingRect();//Bounding rectangle of obj1
+                QRectF rect2 = item2->boundingRect();//Bounding rectangle of obj2
 
-                //speed(dx,dy) is very small so i need to scale it to make collision effect vissible
-                float scale = 100.0f;//multiply by value to increase "push" effect
+                //Calculate center points of both objects
+                QPointF center1 = pos1 + QPointF(rect1.width() / 2, rect1.height() / 2);//Center of obj1
+                QPointF center2 = pos2 + QPointF(rect2.width() / 2, rect2.height() / 2);//Center of obj2
+                QPointF diff = center2 - center1;//Vector from center1 to center2
+                float distance = sqrt(diff.x() * diff.x() + diff.y() * diff.y());//Distance between centers
+
+                if (distance == 0) continue;//Avoid division by zero if objects are exactly overlapping(object on object)
+
+                //Normal vector: direction of collision, normalized to unit length
+                //This vector points from obj1 to obj2 and defines the axis along which momentum is exchanged
+                QPointF normal(diff.x() / distance, diff.y() / distance);
+
+                //Tangent vector: perpendicular to the normal vector (-y, x)
+                //This vector defines the axis along which velocity is unaffected (no friction assumed)
+                QPointF tangent(-normal.y(), normal.x());
+
+                //Project velocities onto normal and tangent vectors using dot product
+                float v1n = dx1 * normal.x() + dy1 * normal.y();//Normal component of obj1 velocity
+                float v1t = dx1 * tangent.x() + dy1 * tangent.y();//Tangent component of obj1 velocity
+                float v2n = dx2 * normal.x() + dy2 * normal.y();//Normal component of obj velocity
+                float v2t = dx2 * tangent.x() + dy2 * tangent.y();//Tangent component of obj2 velocity
+
+                //Calculate new velocities along the normal axis (elastic collision)
+                //These formulas account for mass and ensure conservation of momentum and energy
+                float newV1n = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);//New normal velocity for obj1
+                float newV2n = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);//New normal velocity for obj2
+
+                //Tangent velocities remain unchanged (no friction in this model)
+                float newV1t = v1t;//Tangent velocity for obj1 stays the same
+                float newV2t = v2t;//Tangent velocity for obj2 stays the same
+
+                //Convert back to x and y components by combining normal and tangent contributions
+                float newDx1 = newV1n * normal.x() + newV1t * tangent.x();//New x velocity for obj1
+                float newDy1 = newV1n * normal.y() + newV1t * tangent.y();//New y velocity for obj1
+                float newDx2 = newV2n * normal.x() + newV2t * tangent.x();//New x velocity for obj2
+                float newDy2 = newV2n * normal.y() + newV2t * tangent.y();//New y velocity for obj2
+
+                //Apply scaling factor to make the motion more visible (adjust as needed)
+                float scale = 10.0f;//Scale factor to amplify velocities
                 newDx1 *= scale;
                 newDy1 *= scale;
                 newDx2 *= scale;
                 newDy2 *= scale;
 
-                //update labels with new velocities(to kave new values (wind + collision impact)
+                //Update labels with new velocities
                 updateLabel(obj1->getLabel(), newDx1, newDy1, m1, obj1->getFriction());
                 updateLabel(obj2->getLabel(), newDx2, newDy2, m2, obj2->getFriction());
 
-                //move them a bit to avoid sticking together(use the new speeds)
-                item1->moveBy(newDx1, newDy1);
-                item2->moveBy(newDx2, newDy2);
+                //Separate objects to prevent sticking
+                //Calculate overlap and move objects apart along the normal vector
+                float overlap = (rect1.width() + rect2.width()) / 2 - distance;//Approximate overlap distance
+                if (overlap > 0) {
+                    float moveFactor = overlap / (m1 + m2);//Distribute movement inversely proportional to mass
+                    item1->moveBy(-normal.x() * moveFactor * m2, -normal.y() * moveFactor * m2);//Move obj1 away
+                    item2->moveBy(normal.x() * moveFactor * m1, normal.y() * moveFactor * m1);//Move obj2 away
+                }
             }
         }
     }
