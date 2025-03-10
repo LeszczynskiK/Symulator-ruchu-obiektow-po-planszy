@@ -98,6 +98,8 @@ private:
     void setPhysicalProperties(QGraphicsItem* item);//set physical values(mass and friction) to object
     QLineEdit *massInput;//to type in mass of the object
     QLineEdit *frictionInput;//to type in friction input
+    QLineEdit* windRadiusInput;//max distance to make impact on objects by windpoint
+    QLineEdit* maxForceInput;//max force on the beginning of windpoint having impact on figures
 
     CollisionHandler* collisionHandler;//pointer to CollisionHandler class
 };

@@ -5,10 +5,10 @@
 
 using namespace std;
 
-ThreadedWindPoint::ThreadedWindPoint(float x, float y, float radius, QGraphicsScene* scene)//set start position(1st and 2nd argument), and y radius size of ellipse
+ThreadedWindPoint::ThreadedWindPoint(float x, float y, float radius, float windRadius, float maxForce, QGraphicsScene* scene)//set start position(1st and 2nd argument), and y radius size of ellipse
     : QGraphicsEllipseItem(-radius / 2, -radius / 2, radius, radius),//2 arguments are start pos (co left up corner is on this pos, radius is total size in x and y (diameter)
-    windRadius(500),//example wind width of having impacts on objects
-    maxForce(20),//max push force value(in newton N) - start value(later will be calculated on force variable)
+    windRadius(windRadius),//example wind width of having impacts on objects
+    maxForce(maxForce),//max push force value(in newton N) - start value(later will be calculated on force variable)
     scene(scene)//scene name
 {
     setBrush(QBrush(Qt::yellow));//interior colour of wind object

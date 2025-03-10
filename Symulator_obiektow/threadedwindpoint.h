@@ -22,7 +22,7 @@ extern mutex shapeMutex;
 
 class ThreadedWindPoint : public QGraphicsEllipseItem {
 public:
-    ThreadedWindPoint(float x, float y, float radius, QGraphicsScene* scene);
+    ThreadedWindPoint(float x, float y, float radius, float windRadius, float maxForce, QGraphicsScene* scene);
 
     //put wint impact on all of the passed object in these vectors
     void applyWindForce(vector<unique_ptr<PhysicalRectItem>>& squares,

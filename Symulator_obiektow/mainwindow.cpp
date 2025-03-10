@@ -154,22 +154,38 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
     //type in mass input
     massInput = new QLineEdit(this);
-    massInput->setGeometry(x_pos+7*gap+8*x_size, y_pos, x_size*0.75, y_siz);
+    massInput->setGeometry(x_pos+1*gap+1*x_size, y_pos+y_siz+gap, 0.95*x_size, y_siz);
     massInput->setPlaceholderText("Mass[kg]");//show this, if clicked then make it empty and enable to type in value
     massInput->setFont(font);
     massInput->show();
 
     //type in friction input
     frictionInput = new QLineEdit(this);
-    frictionInput->setGeometry(x_pos+7*gap+8*x_size, y_pos+y_siz+gap, x_size*0.75, y_siz);
+    frictionInput->setGeometry(x_pos+1*gap+1*x_size, y_pos, 0.95*x_size, y_siz);
     frictionInput->setPlaceholderText("Friction");//show this, if clicked then make it empty and enable to type in value
     frictionInput->setFont(font);
     frictionInput->show();
+
+    //type in widnd radius
+    windRadiusInput = new QLineEdit(this);
+    windRadiusInput->setGeometry(x_pos+7*gap+8*x_size, y_pos, x_size*0.8, y_siz);
+    windRadiusInput->setPlaceholderText("Radius");
+    windRadiusInput->setFont(font);
+    windRadiusInput->show();
+
+    //type in max force
+    maxForceInput = new QLineEdit(this);
+    maxForceInput->setGeometry(x_pos+7*gap+8*x_size, y_pos+y_siz+gap, x_size*0.8, y_siz);
+    maxForceInput->setPlaceholderText("Max force");
+    maxForceInput->setFont(font);
+    maxForceInput->show();
 }
 
 MainWindow::~MainWindow() {
     delete simulationTimer;
     delete collisionHandler;//free memory..
+    delete windRadiusInput;
+    delete maxForceInput;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {//Paint event to draw the background
@@ -341,10 +357,37 @@ bool MainWindow::changeWindPointCondition() {//is button clicked?
     return windPointCondition;
 }
 
-void MainWindow::respWindPoint(int x, int y) {//
-    spawnThreadedWindPoint(scene, x, y, 30, windPoints);
-    scene->update();//refresh scene view
+void MainWindow::respWindPoint(int x, int y) {
+    //default values - use if out of limits typed
+    float windRadius = 400.0f;
+    float maxForce = 10.0f;
+    bool ok;
+
+    //load from QLineEdits and limit them(WindRadius)
+    float inputWindRadius = windRadiusInput->text().toFloat(&ok);
+    if (ok) {
+        windRadius = max(50.0f, min(1250.0f, inputWindRadius));
+    } else {
+        qDebug() << "Invalid windRadius input, defaulting to 400";
+    }
+
+     //load from QLineEdits and limit them(MaxForce)
+    float inputMaxForce = maxForceInput->text().toFloat(&ok);
+    if (ok) {
+        maxForce = max(1.0f, min(100.0f, inputMaxForce));
+    } else {
+        qDebug() << "Invalid maxForce input, defaulting to 10";
+    }
+
+    //spawn wind points with the arguments...
+    spawnThreadedWindPoint(scene, x, y, 30, windRadius, maxForce, windPoints);
+
+    scene->update();//update view
     windPointCondition = !windPointCondition;
+
+    //clear qLineEdit fields
+    windRadiusInput->clear();
+    maxForceInput->clear();
 }
 
 void MainWindow::killWindPoints() {

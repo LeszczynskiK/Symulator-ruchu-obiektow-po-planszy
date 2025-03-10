@@ -63,11 +63,11 @@ extern mutex shapeMutex;//mutex to ensure thread-safe access to shared resources
 
 
 //create windpoint (each in new thread)
-inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
 
     //create a unique pointer to a new ThreadedWindPoint object with the specified position and radius
     //ThreadedWindPoint is a custom class that simulates wind effects in the scene
-    auto localWindPoint = make_unique<ThreadedWindPoint>(posX, posY, radius, scene);
+    auto localWindPoint = make_unique<ThreadedWindPoint>(posX, posY, radius,windRadius, maxForce, scene);
 
     //get a raw pointer to the wind point for adding it to the scene (needed because unique_ptr owns the object).
     ThreadedWindPoint* rawWindPoint = localWindPoint.get();
@@ -87,8 +87,8 @@ inline void createThreadedWindPointThread(QGraphicsScene* scene, qreal posX, qre
 }
 
 //run thread for each object of this type
-inline void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
-    shapeThreads.emplace_back(createThreadedWindPointThread, scene, posX, posY, radius, ref(targetVector));
+inline void spawnThreadedWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, qreal radius,float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
+    shapeThreads.emplace_back(createThreadedWindPointThread, scene, posX, posY, radius,windRadius, maxForce, ref(targetVector));
 }
 
 //Template function to create a shape in a separate thread
