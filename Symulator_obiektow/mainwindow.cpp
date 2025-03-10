@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     saveAreaFrame->setGeometry(save_gap+frame_siz, save_gap+frame_siz, save_area_size_x, save_area_size_y);
     saveAreaFrame->setStyleSheet("background-color: transparent; border:1px dotted black;");//1px frame width
 
+    collisionHandler = new CollisionHandler(scene);//initialise collision handling object(to check collisoon between figures...)
+
     QFont font;
     font.setPointSize(16);//Font size
 
@@ -167,6 +169,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
 MainWindow::~MainWindow() {
     delete simulationTimer;
+    delete collisionHandler;//free memory..
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {//Paint event to draw the background
@@ -353,6 +356,30 @@ void MainWindow::killWindPoints() {
 
 void MainWindow::updateSimulation() {
 
+    //helper lambda to move items based on their dx, dy from labels(becouse it is actualised by wind and objects collision)
+    auto moveItems = [&](auto& items) {
+        for (auto& item : items)//loop through all items in the vector
+        {
+            PhysicalObject* obj = dynamic_cast<PhysicalObject*>(item.get());//cast to PhysicalObject
+            if (obj && obj->getLabel())//if its a valid object with a label
+            {
+                float dx = 0.0f, dy = 0.0f;//preinitialise
+                QString text = obj->getLabel()->toPlainText();//get the label text
+                QStringList lines = text.split("\n");//split into lines(to separate valeus) - \n is separation
+                dx = lines[0].mid(4).toFloat();//extract dx(mid(4) means skip 4 chars
+                dy = lines[1].mid(4).toFloat();//extract dy
+                item->moveBy(dx, dy);//move the item by its current speed
+            }
+        }
+    };
+
+    //move all items based on their dx and dy(dx and dy is based on wind and collison impact)
+    moveItems(squares);//move all squares
+    moveItems(rectangles);//move all rectangles
+    moveItems(circles);//move all circles
+    moveItems(triangles);//move all triangles
+    moveItems(trapezes);//move all trapezes
+
     //Define a generic lambda function to remove objects that are outside the black frame boundaries
     //This function works with any container of unique_ptr<QGraphicsItem> (squares, circles, etc.)
     auto removeOutOfBounds = [&](auto& items) {
@@ -404,6 +431,9 @@ void MainWindow::updateSimulation() {
     if (!windPoints.empty()) {//cann only once - becouse we have resultant sum od x and y strenght having impact on objects (impact from wintPoints)
         windPoints[0]->applyWindForce(squares, rectangles, circles, triangles, trapezes, windPoints);
     }
+
+    collisionHandler->checkCollisions(squares, rectangles, circles, triangles, trapezes);//call method to check collisions between objects...
+
     scene->update();
 }
 

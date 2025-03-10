@@ -19,6 +19,7 @@
 #include "menupage.h"
 #include "threadedwindpoint.h"
 #include "ShapeSpawner.h"
+#include "collisionhandler.h"
 
 class MainWindow : public QWidget {
     Q_OBJECT
@@ -97,6 +98,8 @@ private:
     void setPhysicalProperties(QGraphicsItem* item);//set physical values(mass and friction) to object
     QLineEdit *massInput;//to type in mass of the object
     QLineEdit *frictionInput;//to type in friction input
+
+    CollisionHandler* collisionHandler;//pointer to CollisionHandler class
 };
 
 #endif // MAINWINDOW_H
