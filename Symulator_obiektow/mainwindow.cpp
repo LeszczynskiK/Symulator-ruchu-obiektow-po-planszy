@@ -179,6 +179,38 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     maxForceInput->setPlaceholderText("Max force");
     maxForceInput->setFont(font);
     maxForceInput->show();
+
+    QFont infoFont;//define font
+    infoFont.setPointSize(12);//font size for etiquette information
+
+
+    int info_y_pos = saveAreaFrame->y() + saveAreaFrame->height() + 10;//10 px under save area frame
+    int info_gap=250;//space between labels
+    int info_start=355;
+    int info_x_size=225;
+    //range for mass QLineEdit
+    QLabel* massInfoLabel = new QLabel("Mass range: 0.00001 - 100000,", this);
+    massInfoLabel->setFont(infoFont);
+    massInfoLabel->setGeometry(info_start+0*info_gap, info_y_pos, info_x_size, 20);
+    massInfoLabel->setStyleSheet("color: black; background-color: rgba(255, 255, 255, 150);");
+
+    //range for friction QLineEdit
+    QLabel* frictionInfoLabel = new QLabel("Friction range: 0 - 1,", this);
+    frictionInfoLabel->setFont(infoFont);
+    frictionInfoLabel->setGeometry(info_start+1*info_gap, info_y_pos, info_x_size, 20);
+    frictionInfoLabel->setStyleSheet("color: black; background-color: rgba(255, 255, 255, 150);");
+
+    //range for WindRadius
+    QLabel* windRadiusInfoLabel = new QLabel("Wind radius range: 50 - 1250,", this);
+    windRadiusInfoLabel->setFont(infoFont);
+    windRadiusInfoLabel->setGeometry(info_start+2*info_gap, info_y_pos, info_x_size, 20);
+    windRadiusInfoLabel->setStyleSheet("color: black; background-color: rgba(255, 255, 255, 150);");
+
+    //range for maxForce
+    QLabel* maxForceInfoLabel = new QLabel("Wind force range: 1 - 100", this);
+    maxForceInfoLabel->setFont(infoFont);
+    maxForceInfoLabel->setGeometry(info_start+3*info_gap, info_y_pos, info_x_size, 20);
+    maxForceInfoLabel->setStyleSheet("color: black; background-color: rgba(255, 255, 255, 150);");
 }
 
 MainWindow::~MainWindow() {
