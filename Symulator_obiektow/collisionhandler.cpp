@@ -129,9 +129,19 @@ void CollisionHandler::checkCollisionsWithin(vector<unique_ptr<T>>& items)
                 float newDx2 = newV2n * normal.x() + newV2t * tangent.x();//New x velocity for obj2
                 float newDy2 = newV2n * normal.y() + newV2t * tangent.y();//New y velocity for obj2
 
-                //update labels with new velocities(to kave new values (wind + collision impact)
-                updateLabel(obj1->getLabel(), newDx1, newDy1, m1, obj1->getFriction());
-                updateLabel(obj2->getLabel(), newDx2, newDy2, m2, obj2->getFriction());
+
+                //Apply scaling factor to make the motion more visible (adjust as needed)
+                float scale = 1.0f;//Scale factor to amplify velocities
+                newDx1 *= scale;
+                newDy1 *= scale;
+                newDx2 *= scale;
+                newDy2 *= scale;
+
+                //Move objects immediately instead of updating labels with new velocities(before i added collision
+                //effect to label and it was constantly movin with collision effect, I only want to move in once
+                //when collision happen(move once and then let only wind affect)
+                items[i]->moveBy(newDx1, newDy1);//Move obj1 once based on collision
+                items[j]->moveBy(newDx2, newDy2);//Move obj2 once based on collision
 
                 //Separate objects to prevent sticking
                 //Calculate overlap and move objects apart along the normal vector
@@ -216,15 +226,17 @@ void CollisionHandler::checkCollisionsBetween(vector<unique_ptr<T1>>& items1, ve
                 float newDy2 = newV2n * normal.y() + newV2t * tangent.y();//New y velocity for obj2
 
                 //Apply scaling factor to make the motion more visible (adjust as needed)
-                float scale = 10.0f;//Scale factor to amplify velocities
+                float scale = 1.0f;//Scale factor to amplify velocities
                 newDx1 *= scale;
                 newDy1 *= scale;
                 newDx2 *= scale;
                 newDy2 *= scale;
 
-                //Update labels with new velocities
-                updateLabel(obj1->getLabel(), newDx1, newDy1, m1, obj1->getFriction());
-                updateLabel(obj2->getLabel(), newDx2, newDy2, m2, obj2->getFriction());
+                //Move objects immediately instead of updating labels with new velocities(before i added collision
+                //effect to label and it was constantly movin with collision effect, I only want to move in once
+                //when collision happen(move once and then let only wind affect)
+                item1->moveBy(newDx1, newDy1);//Move obj1 once based on collision
+                item2->moveBy(newDx2, newDy2);//Move obj2 once based on collision
 
                 //Separate objects to prevent sticking
                 //Calculate overlap and move objects apart along the normal vector
