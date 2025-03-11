@@ -80,29 +80,38 @@ void CollisionHandler::checkCollisionsWithin(vector<unique_ptr<T>>& items)
                 /*
                 Physics principles applied:
 
-                - Conservation of Momentum: The total momentum of the system before and after
-                  the collision remains constant. Given two objects with masses m1 and m2
-                  and velocities v1 and v2, their momentum is conserved:
-                  m1 * v1 + m2 * v2 = m1 * v1' + m2 * v2'
+                    - Conservation of Momentum: The total momentum of the system before and after
+                      the collision remains constant. Given two objects with masses m1 and m2
+                      and velocities v1 and v2, their momentum is conserved:
+                      m1 * v1 + m2 * v2 = m1 * v1' + m2 * v2'
 
-                - Conservation of Kinetic Energy (Elastic Collision): In a perfectly elastic
-                  collision, kinetic energy is conserved:
-                  0.5 * m1 * v1^2 + 0.5 * m2 * v2^2 = 0.5 * m1 * v1'^2 + 0.5 * m2 * v2'^2
+                    - Conservation of Kinetic Energy (Elastic Collision): In a perfectly elastic
+                      collision, kinetic energy is conserved:
+                      0.5 * m1 * v1^2 + 0.5 * m2 * v2^2 = 0.5 * m1 * v1'^2 + 0.5 * m2 * v2'^2
+                      But with friction, we lose some energy, so it’s not fully elastic anymore.
 
-                - Normal and Tangent Decomposition: Velocities are projected onto the normal
-                  (collision direction) and tangent (perpendicular to normal) components.
-                  - The normal component is updated using momentum conservation.
-                  - The tangent component remains unchanged (assuming no friction).
+                    - Normal and Tangent Decomposition: Velocities are projected onto the normal
+                      (collision direction) and tangent (perpendicular to normal) components.
+                      - The normal component is updated using momentum conservation.
+                      - The tangent component is reduced by friction, slowing things down.
 
-                - Unit Normal and Tangent Vectors: The normal vector defines the axis along
-                  which momentum exchange occurs, while the tangent vector remains unaffected.
+                    - Friction Effect: We use kinetic friction to reduce the tangent velocity.
+                      Friction force depends on the friction coefficient (avgFriction) and acts
+                      opposite to the tangent motion. We model it as a simple reduction:
+                      newVt = Vt * (1 - avgFriction), where avgFriction is the average of both
+                      objects' friction values. This simulates energy loss due to rubbing surfaces,
+                      based on real-world physics where F_friction = mu * F_normal (mu is friction
+                      coefficient, F_normal is normal force). Here, we simplify it to a factor.
 
-                - Collision Response: New normal velocities are computed using the
-                  1D elastic collision formula to maintain both momentum and kinetic energy.
+                    - Unit Normal and Tangent Vectors: The normal vector defines the axis along
+                      which momentum exchange occurs, while the tangent vector is affected by friction.
 
-                - Object Separation: To prevent objects from sticking together,
-                  they are moved apart based on their masses and calculated overlap.
-                */
+                    - Collision Response: New normal velocities are computed using the
+                      1D elastic collision formula, tangent velocities are reduced by friction.
+
+                    - Object Separation: To prevent objects from sticking together,
+                      they are moved apart based on their masses and calculated overlap.
+                 */
 
                 //Normal vector: direction of collision, normalized to unit length
                 //This vector points from obj1 to obj2 and defines the axis along which momentum is exchanged
