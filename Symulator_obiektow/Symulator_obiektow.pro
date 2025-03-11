@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     ShapeCreator.cpp \
+    ShapeCreatorPoints.cpp \
     collisionhandler.cpp \
     informations.cpp \
     main.cpp \

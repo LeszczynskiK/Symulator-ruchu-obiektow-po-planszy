@@ -1,5 +1,6 @@
 #include "ShapeCreator.h"
 
+//extern - becouse defined is in mainwindow
 extern vector<thread> shapeThreads;//threads vector definition
 extern mutex shapeMutex;//mutex definition
 

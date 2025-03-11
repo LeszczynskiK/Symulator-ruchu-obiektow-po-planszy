@@ -79,40 +79,15 @@ void createPolygonShapeThread(QGraphicsScene* scene, const QPolygonF& polygon, Q
 //Creates a thread that calls createPolygonShapeThread with given parameters
 template<typename T>
 void spawnPolygonShape(QGraphicsScene* scene, const QPolygonF& polygon, QColor color, qreal posX, qreal posY,float mass, float friction, vector<unique_ptr<T>>& targetVector) {
-
     // Add a new thread to the shapeThreads vector, passing the createPolygonShapeThread function and its arguments
     shapeThreads.emplace_back(createPolygonShapeThread<T>, scene, polygon, color, posX, posY,mass, friction, ref(targetVector));// ref(targetVector) ensures the vector is passed by reference to the thread
 }
 
-inline void createWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, float radius, float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
-    auto localWindPoint = make_unique<ThreadedWindPoint>(posX, posY, radius, windRadius, maxForce, scene);
-    ThreadedWindPoint* rawWindPoint = localWindPoint.get();
+//Not template funcitons definition
+void createWindPointThread(QGraphicsScene* scene, qreal posX, qreal posY, float radius,//create object
+                           float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector);
 
-    //queue the addition of the wind point and its label to the scene in the main thread
-    QMetaObject::invokeMethod(scene, [scene, rawWindPoint, posX, posY, maxForce, windRadius]() {
-        //Create the label
-        QGraphicsTextItem* label = new QGraphicsTextItem();
-        label->setDefaultTextColor(Qt::black);
-        label->setPlainText(QString("MaxForce: %1\nRadius: %2").arg(maxForce).arg(windRadius));
-        label->setPos(posX, posY - 20);//Position it 20px above the wind point
-        label->setZValue(20);//layer over wintpoint (make sure the visibility is ok)
+void spawnWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, float radius,//use created object to spawn in in scene
+                    float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector);
 
-        //Add the wind point and its label to the scene
-        scene->addItem(rawWindPoint);
-        scene->addItem(label);
-
-        //Link the label to the wind point
-        rawWindPoint->setLabel(label);
-    }, Qt::QueuedConnection);
-
-    //safely transfer ownership to the target vector
-    {
-        lock_guard<mutex> lock(shapeMutex);
-        targetVector.push_back(move(localWindPoint));
-    }
-}
-
-inline void spawnWindPoint(QGraphicsScene* scene, qreal posX, qreal posY, float radius, float windRadius, float maxForce, vector<unique_ptr<ThreadedWindPoint>>& targetVector) {
-    shapeThreads.emplace_back(createWindPointThread, scene, posX, posY, radius, windRadius, maxForce, ref(targetVector));
-}
 #endif // SHAPECREATORPOINTS_H
