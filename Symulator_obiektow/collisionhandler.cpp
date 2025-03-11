@@ -59,6 +59,10 @@ void CollisionHandler::checkCollisionsWithin(vector<unique_ptr<T>>& items)
                 //get masses - needed for realistic bounce based on physics lasw
                 float m1 = obj1->getMass(), m2 = obj2->getMass();
 
+                //get friction coefficients - now we use it to slow things down
+                float f1 = obj1->getFriction(), f2 = obj2->getFriction();
+                float avgFriction = (f1 + f2) / 2.0f;//average friction between the two objects
+
                 //Calculate the collision normal vector (direction of impact)
                 QPointF pos1 = items[i]->pos();//Position of obj1
                 QPointF pos2 = items[j]->pos();//Position of obj2
@@ -119,9 +123,12 @@ void CollisionHandler::checkCollisionsWithin(vector<unique_ptr<T>>& items)
                 float newV1n = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);//New normal velocity for obj1
                 float newV2n = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);//New normal velocity for obj2
 
-                //Tangent velocities remain unchanged (no friction in this model)
-                float newV1t = v1t;//Tangent velocity for obj1 stays the same
-                float newV2t = v2t;//Tangent velocity for obj2 stays the same
+                //Apply friction to tangent velocities - reduce them based on average friction
+                //Friction slows down the tangent component, making collision less elastic
+                float frictionFactor = 1.0f - avgFriction;//Higher friction means more slowdown (0 = full stop, 1 = no friction)
+                float newV1t = v1t * frictionFactor;//Tangent velocity for obj1 reduced by friction
+                float newV2t = v2t * frictionFactor;//Tangent velocity for obj2 reduced by friction
+
 
                 //Convert back to x and y components by combining normal and tangent contributions
                 float newDx1 = newV1n * normal.x() + newV1t * tangent.x();//New x velocity for obj1
@@ -182,6 +189,10 @@ void CollisionHandler::checkCollisionsBetween(vector<unique_ptr<T1>>& items1, ve
                 //get masses - for the bounce calculation
                 float m1 = obj1->getMass(), m2 = obj2->getMass();
 
+                //get friction coefficients - now we use it to slow things down
+                float f1 = obj1->getFriction(), f2 = obj2->getFriction();
+                float avgFriction = (f1 + f2) / 2.0f;//average friction between the two objects
+
                 //Calculate the collision normal vector (direction of impact)
                 QPointF pos1 = item1->pos();//Position of obj1
                 QPointF pos2 = item2->pos();//Position of obj2
@@ -210,14 +221,16 @@ void CollisionHandler::checkCollisionsBetween(vector<unique_ptr<T1>>& items1, ve
                 float v2n = dx2 * normal.x() + dy2 * normal.y();//Normal component of obj velocity
                 float v2t = dx2 * tangent.x() + dy2 * tangent.y();//Tangent component of obj2 velocity
 
+                //Apply friction to tangent velocities - reduce them based on average friction
+                //Friction slows down the tangent component, making collision less elastic
+                float frictionFactor = 1.0f - avgFriction;//Higher friction means more slowdown (0 = full stop, 1 = no friction)
+                float newV1t = v1t * frictionFactor;//Tangent velocity for obj1 reduced by friction
+                float newV2t = v2t * frictionFactor;//Tangent velocity for obj2 reduced by friction
+
                 //Calculate new velocities along the normal axis (elastic collision)
                 //These formulas account for mass and ensure conservation of momentum and energy
                 float newV1n = ((m1 - m2) * v1n + 2 * m2 * v2n) / (m1 + m2);//New normal velocity for obj1
                 float newV2n = ((m2 - m1) * v2n + 2 * m1 * v1n) / (m1 + m2);//New normal velocity for obj2
-
-                //Tangent velocities remain unchanged (no friction in this model)
-                float newV1t = v1t;//Tangent velocity for obj1 stays the same
-                float newV2t = v2t;//Tangent velocity for obj2 stays the same
 
                 //Convert back to x and y components by combining normal and tangent contributions
                 float newDx1 = newV1n * normal.x() + newV1t * tangent.x();//New x velocity for obj1
