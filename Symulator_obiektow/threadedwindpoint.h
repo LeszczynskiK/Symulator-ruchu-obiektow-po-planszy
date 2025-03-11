@@ -32,10 +32,14 @@ public:
                         vector<unique_ptr<PhysicalPolygonItem>>& trapezes,
                         const vector<unique_ptr<ThreadedWindPoint>>& windPoints);
 
+    QGraphicsTextItem* getLabel() const { return label; }//method to get label(force and radius)
+    void setLabel(QGraphicsTextItem* l) { label = l; }//method to set current label
+
 private:
     float windRadius;//max distance of wind strength working on other object
     float maxForce;//max wind force(it is when object is on wind point - than further, than weeker)
     QGraphicsScene* scene;//scene
+    QGraphicsTextItem* label;//label to display radius and MaxForce of winpoint
 };
 
 #endif // THREADEDWINDPOINT_H

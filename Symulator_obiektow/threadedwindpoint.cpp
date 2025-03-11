@@ -9,12 +9,14 @@ ThreadedWindPoint::ThreadedWindPoint(float x, float y, float radius, float windR
     : QGraphicsEllipseItem(-radius / 2, -radius / 2, radius, radius),//2 arguments are start pos (co left up corner is on this pos, radius is total size in x and y (diameter)
     windRadius(windRadius),//example wind width of having impacts on objects
     maxForce(maxForce),//max push force value(in newton N) - start value(later will be calculated on force variable)
-    scene(scene)//scene name
+    scene(scene),//scene name
+    label(nullptr)//label to show maxForce and radius
 {
     setBrush(QBrush(Qt::yellow));//interior colour of wind object
     setPen(QPen(Qt::black));//frame of wind object
     setPos(x,y); //Set the position of the item
     setZValue(10);//Ensure WindPoint is above other items
+
     qDebug() << "WindPoint created at (x, y):" << x << "," << y
              << "Initial pos():" << pos()
              << "Rect:" << rect()

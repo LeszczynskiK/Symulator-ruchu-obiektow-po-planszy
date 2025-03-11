@@ -411,8 +411,8 @@ void MainWindow::respWindPoint(int x, int y) {
         qDebug() << "Invalid maxForce input, defaulting to 10";
     }
 
-    //spawn wind points with the arguments...
-    spawnThreadedWindPoint(scene, x, y, 30, windRadius, maxForce, windPoints);
+    //spawn wind points with the arguments and label
+    spawnWindPoint(scene, x, y, 30, windRadius, maxForce, windPoints);
 
     scene->update();//update view
     windPointCondition = !windPointCondition;
@@ -424,9 +424,16 @@ void MainWindow::respWindPoint(int x, int y) {
 
 void MainWindow::killWindPoints() {
     for (auto& windPoint : windPoints) {
+        //remove and delete the label if it exists
+        if (QGraphicsTextItem* label = windPoint->getLabel()) {
+            scene->removeItem(label);//remove the label from the scene
+            delete label;//free memroy
+            windPoint->setLabel(nullptr);//set pointer as nullptr
+        }
+        //remove the wind point itself
         scene->removeItem(windPoint.get());
     }
-    windPoints.clear();
+    windPoints.clear();//Clear the vector of wind points
 }
 
 void MainWindow::updateSimulation() {
